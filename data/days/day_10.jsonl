@@ -1,0 +1,50 @@
+{"query": "show the available spaces", "action_id": "slack_list_channels"}
+{"query": "schedule the budget review with finance", "action_id": "outlook_create_event"}
+{"query": "create a story for the search redesign", "action_id": "jira_create_issue"}
+{"query": "find info about a colleague", "action_id": "bamboo_get_employee"}
+{"query": "save this file to storage", "action_id": "dropbox_upload_file"}
+{"query": "when is my next meeting", "action_id": "gcal_list_events"}
+{"query": "check on a candidate's progress", "action_id": "greenhouse_get_application"}
+{"query": "create a pipeline entry for the platform upgrade", "action_id": "hubspot_create_deal"}
+{"query": "pull the activity timeline for the marketing contact", "action_id": "hubspot_get_contact"}
+{"query": "upload the test results to the QA channel", "action_id": "slack_upload_file"}
+{"query": "update the job family code", "action_id": "workday_update_worker"}
+{"query": "when am I available", "action_id": "gcal_list_events"}
+{"query": "find the most recent version of the contract", "action_id": "gdrive_list_files"}
+{"query": "create a record for the new finance hire", "action_id": "bamboo_create_employee"}
+{"query": "search for the requirements document", "action_id": "gdrive_list_files"}
+{"query": "attach the spec document to the engineering channel", "action_id": "slack_upload_file"}
+{"query": "open a ticket for the memory leak", "action_id": "jira_create_issue"}
+{"query": "see the touchpoints for this nurture sequence", "action_id": "hubspot_get_contact"}
+{"query": "create a shareable link for the press kit", "action_id": "dropbox_share_file"}
+{"query": "list the unfilled positions", "action_id": "lever_list_opportunities"}
+{"query": "when can the VP meet this week", "action_id": "outlook_get_schedule"}
+{"query": "check the outstanding issues", "action_id": "jira_list_issues"}
+{"query": "add a new candidate", "action_id": "lever_create_candidate"}
+{"query": "upload the raw data export", "action_id": "dropbox_upload_file"}
+{"query": "add the inbound from the pricing page form", "action_id": "salesforce_create_lead"}
+{"query": "how many remote employees do we have", "action_id": "bamboo_list_employees"}
+{"query": "create a group for the vendor integration", "action_id": "teams_create_channel"}
+{"query": "create a to-do", "action_id": "asana_create_task"}
+{"query": "let the account team know about the renewal", "action_id": "teams_send_message"}
+{"query": "find 30 minutes where both directors are free", "action_id": "outlook_get_schedule"}
+{"query": "we need a place to discuss this project", "action_id": "teams_create_channel"}
+{"query": "show all enterprise-tier accounts", "action_id": "salesforce_list_accounts"}
+{"query": "post the weekly metrics to the leadership chat", "action_id": "teams_send_message"}
+{"query": "pull the list of accounts assigned to me", "action_id": "salesforce_list_accounts"}
+{"query": "add a new person to the system", "action_id": "bamboo_create_employee"}
+{"query": "message the group about the project update", "action_id": "slack_send_message"}
+{"query": "open a space for the compliance review", "action_id": "teams_create_channel"}
+{"query": "fix the record", "action_id": "workday_update_worker"}
+{"query": "onboard the new designer into the system", "action_id": "bamboo_create_employee"}
+{"query": "set up the vendor kickoff meeting", "action_id": "outlook_create_event"}
+{"query": "add the person who responded to the job post", "action_id": "lever_create_candidate"}
+{"query": "set up the new joiner", "action_id": "bamboo_create_employee"}
+{"query": "drop the architecture diagram in the channel", "action_id": "slack_upload_file"}
+{"query": "what's this person's job level", "action_id": "workday_get_worker"}
+{"query": "register a new applicant", "action_id": "greenhouse_create_candidate"}
+{"query": "list the applicants for the backend role", "action_id": "greenhouse_list_candidates"}
+{"query": "show the open work items", "action_id": "jira_list_issues"}
+{"query": "put the signed contract in the shared drive", "action_id": "gdrive_upload_file"}
+{"query": "look someone up", "action_id": "bamboo_get_employee"}
+{"query": "track this action item", "action_id": "asana_create_task"}

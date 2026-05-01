@@ -1,0 +1,50 @@
+{"query": "send the agency a link to the brand assets", "action_id": "dropbox_share_file"}
+{"query": "save this file to storage", "action_id": "dropbox_upload_file"}
+{"query": "schedule a meeting with the team", "action_id": "outlook_create_event"}
+{"query": "find the most recent version of the contract", "action_id": "gdrive_list_files"}
+{"query": "add the design review to the sprint board", "action_id": "asana_create_task"}
+{"query": "add the expansion revenue to the pipeline", "action_id": "hubspot_create_deal"}
+{"query": "create a record for the new finance hire", "action_id": "bamboo_create_employee"}
+{"query": "schedule a pairing session with the new hire", "action_id": "gcal_create_event"}
+{"query": "when is the meeting room available", "action_id": "outlook_get_schedule"}
+{"query": "show the available spaces", "action_id": "slack_list_channels"}
+{"query": "when can the VP meet this week", "action_id": "outlook_get_schedule"}
+{"query": "file an issue for the broken pagination", "action_id": "jira_create_issue"}
+{"query": "register the new grad who starts monday", "action_id": "bamboo_create_employee"}
+{"query": "give the partner access to the documentation", "action_id": "dropbox_share_file"}
+{"query": "list the unfilled positions", "action_id": "lever_list_opportunities"}
+{"query": "drop the architecture diagram in the channel", "action_id": "slack_upload_file"}
+{"query": "forward the board update to the leadership chat", "action_id": "teams_send_message"}
+{"query": "pull the contact record for the renewal conversation", "action_id": "salesforce_get_contact"}
+{"query": "where should this conversation go", "action_id": "slack_list_channels"}
+{"query": "create a discussion group for the architecture review", "action_id": "teams_create_channel"}
+{"query": "pull the complete org chart data", "action_id": "bamboo_list_employees"}
+{"query": "enter the candidate from the recruiter's outreach", "action_id": "lever_create_candidate"}
+{"query": "what discussion groups exist", "action_id": "slack_list_channels"}
+{"query": "create a lead record", "action_id": "salesforce_create_lead"}
+{"query": "onboard the new designer into the system", "action_id": "bamboo_create_employee"}
+{"query": "save the client assets to external storage", "action_id": "dropbox_upload_file"}
+{"query": "change someone's employment status to part-time", "action_id": "workday_update_worker"}
+{"query": "store the video renders externally", "action_id": "dropbox_upload_file"}
+{"query": "put the onboarding docs in the shared space", "action_id": "gdrive_upload_file"}
+{"query": "find the right place for this discussion", "action_id": "slack_list_channels"}
+{"query": "get the full list of contractors", "action_id": "bamboo_list_employees"}
+{"query": "is the hiring manager free on thursday", "action_id": "outlook_get_schedule"}
+{"query": "schedule the steering committee meeting", "action_id": "outlook_create_event"}
+{"query": "open a ticket for the memory leak", "action_id": "jira_create_issue"}
+{"query": "how many people applied this week", "action_id": "greenhouse_list_candidates"}
+{"query": "pull the compensation history", "action_id": "workday_get_worker"}
+{"query": "set up a deal record for the enterprise upsell", "action_id": "hubspot_create_deal"}
+{"query": "set up a channel for the product launch", "action_id": "teams_create_channel"}
+{"query": "show everyone who started this quarter", "action_id": "bamboo_list_employees"}
+{"query": "get the emergency contact for this person", "action_id": "bamboo_get_employee"}
+{"query": "which channels are active", "action_id": "slack_list_channels"}
+{"query": "tell the frontend channel about the new component", "action_id": "slack_send_message"}
+{"query": "see all the channels we have", "action_id": "slack_list_channels"}
+{"query": "check the benefits enrollment for an employee", "action_id": "workday_get_worker"}
+{"query": "save this file to storage", "action_id": "dropbox_upload_file"}
+{"query": "check when someone joined the company", "action_id": "bamboo_get_employee"}
+{"query": "add the intern to the employee database", "action_id": "bamboo_create_employee"}
+{"query": "what discussion groups exist", "action_id": "slack_list_channels"}
+{"query": "look up someone's pay grade", "action_id": "workday_get_worker"}
+{"query": "make a dedicated room for the hiring committee", "action_id": "teams_create_channel"}

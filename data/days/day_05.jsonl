@@ -1,0 +1,49 @@
+{"query": "open a space for the compliance review", "action_id": "teams_create_channel"}
+{"query": "what's this person's job level", "action_id": "workday_get_worker"}
+{"query": "look someone up", "action_id": "bamboo_get_employee"}
+{"query": "schedule the team lunch for next week", "action_id": "gcal_create_event"}
+{"query": "share the postmortem findings in the channel", "action_id": "slack_send_message"}
+{"query": "make the compliance docs available to the auditor", "action_id": "dropbox_share_file"}
+{"query": "get the buyer's email from the enterprise account", "action_id": "salesforce_get_contact"}
+{"query": "save the brand guidelines to the design folder", "action_id": "gdrive_upload_file"}
+{"query": "give the partner access to the documentation", "action_id": "dropbox_share_file"}
+{"query": "is the data engineer application still active", "action_id": "greenhouse_get_application"}
+{"query": "show the unresolved defects", "action_id": "jira_list_issues"}
+{"query": "create a space for collaboration", "action_id": "teams_create_channel"}
+{"query": "schedule something", "action_id": "gcal_create_event"}
+{"query": "post an update for stakeholders", "action_id": "slack_send_message"}
+{"query": "check the equity vesting schedule for someone", "action_id": "workday_get_worker"}
+{"query": "get the emergency contact for this person", "action_id": "bamboo_get_employee"}
+{"query": "upload the research findings to the project space", "action_id": "gdrive_upload_file"}
+{"query": "set up a channel for the product launch", "action_id": "teams_create_channel"}
+{"query": "find 30 minutes where both directors are free", "action_id": "outlook_get_schedule"}
+{"query": "add the design review to the sprint board", "action_id": "asana_create_task"}
+{"query": "what campaign brought this contact in", "action_id": "hubspot_get_contact"}
+{"query": "register the new grad who starts monday", "action_id": "bamboo_create_employee"}
+{"query": "pull up an employee's personal details", "action_id": "bamboo_get_employee"}
+{"query": "what's the lead score for this prospect", "action_id": "hubspot_get_contact"}
+{"query": "tell the frontend channel about the new component", "action_id": "slack_send_message"}
+{"query": "archive the final deliverables", "action_id": "dropbox_upload_file"}
+{"query": "message the group about the project update", "action_id": "slack_send_message"}
+{"query": "schedule the budget review with finance", "action_id": "outlook_create_event"}
+{"query": "get the word out to the team", "action_id": "slack_send_message"}
+{"query": "upload the error logs for debugging", "action_id": "slack_upload_file"}
+{"query": "show all accounts in the APAC region", "action_id": "salesforce_list_accounts"}
+{"query": "set up the monthly department sync", "action_id": "outlook_create_event"}
+{"query": "which teams have open headcount", "action_id": "lever_list_opportunities"}
+{"query": "upload the raw data export", "action_id": "dropbox_upload_file"}
+{"query": "set up a conversation space for the incident response", "action_id": "teams_create_channel"}
+{"query": "create a task for the landing page update", "action_id": "asana_create_task"}
+{"query": "what's the current hiring plan look like", "action_id": "lever_list_opportunities"}
+{"query": "check someone's employment type", "action_id": "bamboo_get_employee"}
+{"query": "what bugs are blocking the release", "action_id": "jira_list_issues"}
+{"query": "when is the meeting room available", "action_id": "outlook_get_schedule"}
+{"query": "post the standup notes for the team", "action_id": "slack_send_message"}
+{"query": "check the conversion path for this lead", "action_id": "hubspot_get_contact"}
+{"query": "post the wireframes for review", "action_id": "slack_upload_file"}
+{"query": "get the full list of contractors", "action_id": "bamboo_list_employees"}
+{"query": "save the final deck to the team folder", "action_id": "gdrive_upload_file"}
+{"query": "show the employee directory", "action_id": "bamboo_list_employees"}
+{"query": "find a colleague's office location", "action_id": "bamboo_get_employee"}
+{"query": "submit the sourced profile for the DevOps role", "action_id": "lever_create_candidate"}
+{"query": "add a new person to the system", "action_id": "bamboo_create_employee"}

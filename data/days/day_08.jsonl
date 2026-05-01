@@ -1,0 +1,49 @@
+{"query": "upload this somewhere accessible", "action_id": "gdrive_upload_file"}
+{"query": "notify the on-call channel about the alert", "action_id": "slack_send_message"}
+{"query": "check if tuesday morning is open", "action_id": "gcal_list_events"}
+{"query": "open a space for the compliance review", "action_id": "teams_create_channel"}
+{"query": "get the HR record", "action_id": "workday_get_worker"}
+{"query": "drop the architecture diagram in the channel", "action_id": "slack_upload_file"}
+{"query": "check the email open rate for this lead", "action_id": "hubspot_get_contact"}
+{"query": "find a place to have this conversation", "action_id": "slack_list_channels"}
+{"query": "search for that document", "action_id": "gdrive_list_files"}
+{"query": "onboard the new designer into the system", "action_id": "bamboo_create_employee"}
+{"query": "upload the research findings to the project space", "action_id": "gdrive_upload_file"}
+{"query": "pull up this prospect's record", "action_id": "hubspot_get_contact"}
+{"query": "check if I'm free", "action_id": "outlook_get_schedule"}
+{"query": "look up someone's department", "action_id": "bamboo_get_employee"}
+{"query": "set up a channel for the product launch", "action_id": "teams_create_channel"}
+{"query": "find the right place for this discussion", "action_id": "slack_list_channels"}
+{"query": "get this file to the team", "action_id": "slack_upload_file"}
+{"query": "look up an employee's profile", "action_id": "bamboo_get_employee"}
+{"query": "show the unresolved defects", "action_id": "jira_list_issues"}
+{"query": "book a slot for the candidate debrief", "action_id": "gcal_create_event"}
+{"query": "list the accounts with active deals", "action_id": "salesforce_list_accounts"}
+{"query": "check someone's record in the people system", "action_id": "bamboo_get_employee"}
+{"query": "archive the final deliverables", "action_id": "dropbox_upload_file"}
+{"query": "set up the vendor kickoff meeting", "action_id": "outlook_create_event"}
+{"query": "tell the frontend channel about the new component", "action_id": "slack_send_message"}
+{"query": "what's on the agenda for this week", "action_id": "gcal_list_events"}
+{"query": "what team is this person on", "action_id": "bamboo_get_employee"}
+{"query": "I need to track this", "action_id": "jira_create_issue"}
+{"query": "locate the project brief", "action_id": "gdrive_list_files"}
+{"query": "enter the applicant who emailed their CV", "action_id": "greenhouse_create_candidate"}
+{"query": "share this with an external party", "action_id": "dropbox_share_file"}
+{"query": "schedule the steering committee meeting", "action_id": "outlook_create_event"}
+{"query": "adjust the salary band after the annual review", "action_id": "workday_update_worker"}
+{"query": "ping someone about the status", "action_id": "teams_send_message"}
+{"query": "how many roles are we recruiting for", "action_id": "lever_list_opportunities"}
+{"query": "send the file to the channel", "action_id": "slack_upload_file"}
+{"query": "add the design review to the sprint board", "action_id": "asana_create_task"}
+{"query": "register the internal transfer as a candidate", "action_id": "greenhouse_create_candidate"}
+{"query": "check the equity vesting schedule for someone", "action_id": "workday_get_worker"}
+{"query": "make the compliance docs available to the auditor", "action_id": "dropbox_share_file"}
+{"query": "pull the complete org chart data", "action_id": "bamboo_list_employees"}
+{"query": "show the active requisitions", "action_id": "lever_list_opportunities"}
+{"query": "add the expansion revenue to the pipeline", "action_id": "hubspot_create_deal"}
+{"query": "which teams have open headcount", "action_id": "lever_list_opportunities"}
+{"query": "what bugs are blocking the release", "action_id": "jira_list_issues"}
+{"query": "change someone's employment status to part-time", "action_id": "workday_update_worker"}
+{"query": "show the tickets assigned to me", "action_id": "jira_list_issues"}
+{"query": "create a deal for the annual renewal", "action_id": "hubspot_create_deal"}
+{"query": "write to the executive group about Q3", "action_id": "teams_send_message"}

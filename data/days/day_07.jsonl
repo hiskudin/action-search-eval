@@ -1,0 +1,50 @@
+{"query": "open a ticket for the memory leak", "action_id": "jira_create_issue"}
+{"query": "which channels are active", "action_id": "slack_list_channels"}
+{"query": "adjust the salary band after the annual review", "action_id": "workday_update_worker"}
+{"query": "where should I post this", "action_id": "slack_list_channels"}
+{"query": "create a record for the new finance hire", "action_id": "bamboo_create_employee"}
+{"query": "add the inbound from the pricing page form", "action_id": "salesforce_create_lead"}
+{"query": "create a lead record", "action_id": "salesforce_create_lead"}
+{"query": "find 30 minutes where both directors are free", "action_id": "outlook_get_schedule"}
+{"query": "is anyone free", "action_id": "outlook_get_schedule"}
+{"query": "who has applied recently", "action_id": "greenhouse_list_candidates"}
+{"query": "register this person as a candidate", "action_id": "lever_create_candidate"}
+{"query": "do I have anything at 3pm", "action_id": "gcal_list_events"}
+{"query": "start tracking the professional services engagement", "action_id": "hubspot_create_deal"}
+{"query": "send the file to the channel", "action_id": "slack_upload_file"}
+{"query": "how many open issues in the sprint", "action_id": "jira_list_issues"}
+{"query": "look up someone's pay grade", "action_id": "workday_get_worker"}
+{"query": "add the design review to the sprint board", "action_id": "asana_create_task"}
+{"query": "correct the work location after the office move", "action_id": "workday_update_worker"}
+{"query": "list all the groups", "action_id": "slack_list_channels"}
+{"query": "pull up this prospect's record", "action_id": "hubspot_get_contact"}
+{"query": "put the onboarding docs in the shared space", "action_id": "gdrive_upload_file"}
+{"query": "send the agency a link to the brand assets", "action_id": "dropbox_share_file"}
+{"query": "set up the vendor kickoff meeting", "action_id": "outlook_create_event"}
+{"query": "schedule a pairing session with the new hire", "action_id": "gcal_create_event"}
+{"query": "make the compliance docs available to the auditor", "action_id": "dropbox_share_file"}
+{"query": "set up a conversation space for the incident response", "action_id": "teams_create_channel"}
+{"query": "update employee information", "action_id": "workday_update_worker"}
+{"query": "share the attachment with everyone", "action_id": "slack_upload_file"}
+{"query": "create a to-do for the newsletter", "action_id": "asana_create_task"}
+{"query": "look up someone's department", "action_id": "bamboo_get_employee"}
+{"query": "put the signed contract in the shared drive", "action_id": "gdrive_upload_file"}
+{"query": "set up a channel for the product launch", "action_id": "teams_create_channel"}
+{"query": "check someone's employment type", "action_id": "bamboo_get_employee"}
+{"query": "how many candidates are in the final round", "action_id": "greenhouse_list_candidates"}
+{"query": "am I free later", "action_id": "gcal_list_events"}
+{"query": "enter the applicant who emailed their CV", "action_id": "greenhouse_create_candidate"}
+{"query": "change someone's employment status to part-time", "action_id": "workday_update_worker"}
+{"query": "list everyone on the data team", "action_id": "bamboo_list_employees"}
+{"query": "correct a record in the people system", "action_id": "workday_update_worker"}
+{"query": "share a file with someone outside the company", "action_id": "dropbox_share_file"}
+{"query": "see all the channels we have", "action_id": "slack_list_channels"}
+{"query": "make a dedicated room for the hiring committee", "action_id": "teams_create_channel"}
+{"query": "enter the candidate from the recruiter's outreach", "action_id": "lever_create_candidate"}
+{"query": "store the training materials in the drive folder", "action_id": "gdrive_upload_file"}
+{"query": "pass the message along to the group", "action_id": "teams_send_message"}
+{"query": "post the demo recording link for the team", "action_id": "slack_send_message"}
+{"query": "post an update for stakeholders", "action_id": "slack_send_message"}
+{"query": "what team is this person on", "action_id": "bamboo_get_employee"}
+{"query": "put the file somewhere safe", "action_id": "gdrive_upload_file"}
+{"query": "create a deal record", "action_id": "hubspot_create_deal"}

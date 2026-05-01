@@ -1,0 +1,50 @@
+{"query": "notify the on-call channel about the alert", "action_id": "slack_send_message"}
+{"query": "is the data engineer application still active", "action_id": "greenhouse_get_application"}
+{"query": "upload the test results to the QA channel", "action_id": "slack_upload_file"}
+{"query": "message the director about the budget approval", "action_id": "teams_send_message"}
+{"query": "let everyone know the build passed", "action_id": "slack_send_message"}
+{"query": "save the final deck to the team folder", "action_id": "gdrive_upload_file"}
+{"query": "pull the complete org chart data", "action_id": "bamboo_list_employees"}
+{"query": "show everyone who started this quarter", "action_id": "bamboo_list_employees"}
+{"query": "check the equity vesting schedule for someone", "action_id": "workday_get_worker"}
+{"query": "list everyone on the data team", "action_id": "bamboo_list_employees"}
+{"query": "when is the meeting room available", "action_id": "outlook_get_schedule"}
+{"query": "who made it past the phone screen", "action_id": "greenhouse_list_candidates"}
+{"query": "drop the architecture diagram in the channel", "action_id": "slack_upload_file"}
+{"query": "find a free slot", "action_id": "outlook_get_schedule"}
+{"query": "list the unfilled positions", "action_id": "lever_list_opportunities"}
+{"query": "save the client assets to external storage", "action_id": "dropbox_upload_file"}
+{"query": "schedule a pairing session with the new hire", "action_id": "gcal_create_event"}
+{"query": "set up the vendor kickoff meeting", "action_id": "outlook_create_event"}
+{"query": "add a new person to the system", "action_id": "bamboo_create_employee"}
+{"query": "onboard the new designer into the system", "action_id": "bamboo_create_employee"}
+{"query": "put the signed contract in the shared drive", "action_id": "gdrive_upload_file"}
+{"query": "post the wireframes for review", "action_id": "slack_upload_file"}
+{"query": "file this as a bug", "action_id": "jira_create_issue"}
+{"query": "enter the candidate from the recruiter's outreach", "action_id": "lever_create_candidate"}
+{"query": "add the intern to the employee database", "action_id": "bamboo_create_employee"}
+{"query": "set up a channel for the product launch", "action_id": "teams_create_channel"}
+{"query": "tell the frontend channel about the new component", "action_id": "slack_send_message"}
+{"query": "log the accessibility issue from the audit", "action_id": "jira_create_issue"}
+{"query": "track this opportunity", "action_id": "hubspot_create_deal"}
+{"query": "book a slot for the candidate debrief", "action_id": "gcal_create_event"}
+{"query": "get the full list of contractors", "action_id": "bamboo_list_employees"}
+{"query": "put 30 minutes on the calendar for the code review", "action_id": "gcal_create_event"}
+{"query": "register a new employee", "action_id": "bamboo_create_employee"}
+{"query": "upload the error logs for debugging", "action_id": "slack_upload_file"}
+{"query": "pull the compensation history", "action_id": "workday_get_worker"}
+{"query": "upload the document", "action_id": "gdrive_upload_file"}
+{"query": "which customers are up for renewal this quarter", "action_id": "salesforce_list_accounts"}
+{"query": "open a space for the compliance review", "action_id": "teams_create_channel"}
+{"query": "find info about this lead", "action_id": "hubspot_get_contact"}
+{"query": "find the most recent version of the contract", "action_id": "gdrive_list_files"}
+{"query": "create a group for the vendor integration", "action_id": "teams_create_channel"}
+{"query": "create a discussion group for the architecture review", "action_id": "teams_create_channel"}
+{"query": "post the demo recording link for the team", "action_id": "slack_send_message"}
+{"query": "list the accounts with active deals", "action_id": "salesforce_list_accounts"}
+{"query": "put the onboarding docs in the shared space", "action_id": "gdrive_upload_file"}
+{"query": "look up someone's pay grade", "action_id": "workday_get_worker"}
+{"query": "file an issue for the broken pagination", "action_id": "jira_create_issue"}
+{"query": "store the training materials in the drive folder", "action_id": "gdrive_upload_file"}
+{"query": "create a story for the search redesign", "action_id": "jira_create_issue"}
+{"query": "adjust the salary band after the annual review", "action_id": "workday_update_worker"}

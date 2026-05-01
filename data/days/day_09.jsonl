@@ -1,0 +1,50 @@
+{"query": "which channels are active", "action_id": "slack_list_channels"}
+{"query": "let the consultant access the project files", "action_id": "dropbox_share_file"}
+{"query": "find a place to have this conversation", "action_id": "slack_list_channels"}
+{"query": "save the brand guidelines to the design folder", "action_id": "gdrive_upload_file"}
+{"query": "browse the shared drive for the report", "action_id": "gdrive_list_files"}
+{"query": "track the social media campaign deliverable", "action_id": "asana_create_task"}
+{"query": "what's in the backlog for next sprint", "action_id": "jira_list_issues"}
+{"query": "book a time slot", "action_id": "gcal_create_event"}
+{"query": "change someone's details", "action_id": "workday_update_worker"}
+{"query": "open a channel for this initiative", "action_id": "teams_create_channel"}
+{"query": "create a bug report for the checkout crash", "action_id": "jira_create_issue"}
+{"query": "add the linkedin response to the candidate pool", "action_id": "lever_create_candidate"}
+{"query": "list my meetings for the rest of the day", "action_id": "gcal_list_events"}
+{"query": "how many customers are in the portfolio", "action_id": "salesforce_list_accounts"}
+{"query": "pull the contact record for the renewal conversation", "action_id": "salesforce_get_contact"}
+{"query": "get the HR record", "action_id": "workday_get_worker"}
+{"query": "schedule the team lunch for next week", "action_id": "gcal_create_event"}
+{"query": "find a time that works for all three panelists", "action_id": "outlook_get_schedule"}
+{"query": "add the expansion revenue to the pipeline", "action_id": "hubspot_create_deal"}
+{"query": "onboard someone into the system", "action_id": "bamboo_create_employee"}
+{"query": "make a dedicated room for the hiring committee", "action_id": "teams_create_channel"}
+{"query": "pull the activity timeline for the marketing contact", "action_id": "hubspot_get_contact"}
+{"query": "make the compliance docs available to the auditor", "action_id": "dropbox_share_file"}
+{"query": "pull the compensation history", "action_id": "workday_get_worker"}
+{"query": "let everyone know the build passed", "action_id": "slack_send_message"}
+{"query": "post an update for stakeholders", "action_id": "slack_send_message"}
+{"query": "add the inbound from the pricing page form", "action_id": "salesforce_create_lead"}
+{"query": "add the referral from the engineering manager", "action_id": "greenhouse_create_candidate"}
+{"query": "put 30 minutes on the calendar for the code review", "action_id": "gcal_create_event"}
+{"query": "update the job family code", "action_id": "workday_update_worker"}
+{"query": "add a task for this", "action_id": "asana_create_task"}
+{"query": "share this with an external party", "action_id": "dropbox_share_file"}
+{"query": "drop the architecture diagram in the channel", "action_id": "slack_upload_file"}
+{"query": "schedule the steering committee meeting", "action_id": "outlook_create_event"}
+{"query": "save the final deck to the team folder", "action_id": "gdrive_upload_file"}
+{"query": "review someone's employment info", "action_id": "workday_get_worker"}
+{"query": "register the new grad who starts monday", "action_id": "bamboo_create_employee"}
+{"query": "post the demo recording link for the team", "action_id": "slack_send_message"}
+{"query": "add a candidate to the system", "action_id": "greenhouse_create_candidate"}
+{"query": "let the account team know about the renewal", "action_id": "teams_send_message"}
+{"query": "create a group for the vendor integration", "action_id": "teams_create_channel"}
+{"query": "which customers are up for renewal this quarter", "action_id": "salesforce_list_accounts"}
+{"query": "post the wireframes for review", "action_id": "slack_upload_file"}
+{"query": "log this as a task", "action_id": "asana_create_task"}
+{"query": "look up someone's department", "action_id": "bamboo_get_employee"}
+{"query": "has the candidate completed the take-home", "action_id": "greenhouse_get_application"}
+{"query": "locate the project brief", "action_id": "gdrive_list_files"}
+{"query": "is the data engineer application still active", "action_id": "greenhouse_get_application"}
+{"query": "check worker details", "action_id": "workday_get_worker"}
+{"query": "enter the transfer from the acquisition", "action_id": "bamboo_create_employee"}

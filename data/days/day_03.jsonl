@@ -1,0 +1,50 @@
+{"query": "schedule a pairing session with the new hire", "action_id": "gcal_create_event"}
+{"query": "back up the production files off-site", "action_id": "dropbox_upload_file"}
+{"query": "add a task for this", "action_id": "asana_create_task"}
+{"query": "check the conversion path for this lead", "action_id": "hubspot_get_contact"}
+{"query": "list everyone on the data team", "action_id": "bamboo_list_employees"}
+{"query": "how many candidates are in the final round", "action_id": "greenhouse_list_candidates"}
+{"query": "see all the channels we have", "action_id": "slack_list_channels"}
+{"query": "see the touchpoints for this nurture sequence", "action_id": "hubspot_get_contact"}
+{"query": "book the executive review session", "action_id": "outlook_create_event"}
+{"query": "search for the requirements document", "action_id": "gdrive_list_files"}
+{"query": "archive the final deliverables", "action_id": "dropbox_upload_file"}
+{"query": "get the full list of contractors", "action_id": "bamboo_list_employees"}
+{"query": "what's on the agenda for this week", "action_id": "gcal_list_events"}
+{"query": "adjust the salary band after the annual review", "action_id": "workday_update_worker"}
+{"query": "make the compliance docs available to the auditor", "action_id": "dropbox_share_file"}
+{"query": "pull the compensation history", "action_id": "workday_get_worker"}
+{"query": "update the job family code", "action_id": "workday_update_worker"}
+{"query": "log the hand-raiser from the whitepaper download", "action_id": "salesforce_create_lead"}
+{"query": "where should this conversation go", "action_id": "slack_list_channels"}
+{"query": "upload the error logs for debugging", "action_id": "slack_upload_file"}
+{"query": "upload the test results to the QA channel", "action_id": "slack_upload_file"}
+{"query": "change the manager field for the lateral move", "action_id": "workday_update_worker"}
+{"query": "create a group for the vendor integration", "action_id": "teams_create_channel"}
+{"query": "show the list of team channels", "action_id": "slack_list_channels"}
+{"query": "enter the applicant who emailed their CV", "action_id": "greenhouse_create_candidate"}
+{"query": "track this bug", "action_id": "jira_create_issue"}
+{"query": "open a ticket for the memory leak", "action_id": "jira_create_issue"}
+{"query": "schedule the budget review with finance", "action_id": "outlook_create_event"}
+{"query": "get the emergency contact for this person", "action_id": "bamboo_get_employee"}
+{"query": "set up a channel for the product launch", "action_id": "teams_create_channel"}
+{"query": "relay the decision to the management chat", "action_id": "teams_send_message"}
+{"query": "save the brand guidelines to the design folder", "action_id": "gdrive_upload_file"}
+{"query": "make a dedicated room for the hiring committee", "action_id": "teams_create_channel"}
+{"query": "which channels are active", "action_id": "slack_list_channels"}
+{"query": "change someone's employment status to part-time", "action_id": "workday_update_worker"}
+{"query": "show everyone who started this quarter", "action_id": "bamboo_list_employees"}
+{"query": "check someone's employment type", "action_id": "bamboo_get_employee"}
+{"query": "set up the returning employee after their leave", "action_id": "bamboo_create_employee"}
+{"query": "let everyone know the build passed", "action_id": "slack_send_message"}
+{"query": "register the company from the trade show booth", "action_id": "salesforce_create_lead"}
+{"query": "find the most recent version of the contract", "action_id": "gdrive_list_files"}
+{"query": "what discussion groups exist", "action_id": "slack_list_channels"}
+{"query": "back up the photography files", "action_id": "dropbox_upload_file"}
+{"query": "browse the shared drive for the report", "action_id": "gdrive_list_files"}
+{"query": "who made it past the phone screen", "action_id": "greenhouse_list_candidates"}
+{"query": "when is my next meeting", "action_id": "gcal_list_events"}
+{"query": "correct the work location after the office move", "action_id": "workday_update_worker"}
+{"query": "check the schedule", "action_id": "gcal_list_events"}
+{"query": "find the right place for this discussion", "action_id": "slack_list_channels"}
+{"query": "submit the resume we received for the PM role", "action_id": "greenhouse_create_candidate"}

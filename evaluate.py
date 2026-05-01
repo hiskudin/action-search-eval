@@ -13,7 +13,8 @@ Usage:
 import argparse
 import json
 import requests
-from config import SERVER_URL
+
+SERVER_URL = "http://localhost:5117"
 
 
 def fetch_queries(day: int) -> list[dict]:
@@ -36,17 +37,19 @@ def main():
     parser.add_argument("--day", type=int, required=True, help="Day number (1-10)")
     args = parser.parse_args()
 
-    # ── This is where candidates plug in their model ──
-    # The baseline below just returns a dummy prediction.
-    # Replace this with your actual model inference.
+    from sentence_transformers import SentenceTransformer
+    from baseline import load_actions, build_action_index, predict, MODEL_NAME
+
+    model = SentenceTransformer(MODEL_NAME)
+    actions = load_actions()
+    action_embs, action_ids = build_action_index(model, actions)
 
     queries = fetch_queries(args.day)
     print(f"Day {args.day}: {len(queries)} queries")
 
     predictions = []
     for q in queries:
-        # TODO: replace with your model
-        predicted_action = "slack_send_message"  # dummy
+        predicted_action = predict(model, action_embs, action_ids, q["query"])
         predictions.append({"id": q["id"], "action_id": predicted_action})
 
     result = submit_predictions(args.day, predictions)

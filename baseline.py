@@ -1,13 +1,13 @@
 """
 Minimal baseline: embed actions and queries with MiniLM, match by cosine similarity.
-
-This is intentionally bare-bones. It trains nothing - just uses off-the-shelf embeddings.
-Candidates should do better than this.
 """
 import json
+from pathlib import Path
 import numpy as np
 from sentence_transformers import SentenceTransformer
-from config import DATA_DIR, MODEL_NAME
+
+DATA_DIR = Path(__file__).parent / "data"
+MODEL_NAME = "sentence-transformers/all-MiniLM-L6-v2"
 
 
 def load_actions():

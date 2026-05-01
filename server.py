@@ -18,7 +18,8 @@ app = Flask(__name__)
 
 ROOT = Path(__file__).parent
 DATA_DIR = ROOT / "data"
-DAYS_DIR = ROOT / "_internal" / "days"
+EXPOSED_DAYS_DIR = DATA_DIR / "days"       # days 1-10 (candidate-visible)
+HIDDEN_DAYS_DIR = ROOT / "_internal" / "days"  # days 11-30 (held-out)
 
 # Load data at startup
 with open(DATA_DIR / "actions.json") as f:
@@ -30,13 +31,16 @@ with open(DATA_DIR / "train.jsonl") as f:
         TRAIN_DATA.append(json.loads(line))
 
 DAY_DATA = {}
-for p in sorted(DAYS_DIR.glob("day_*.jsonl")):
-    day_num = int(p.stem.split("_")[1])
-    samples = []
-    with open(p) as f:
-        for line in f:
-            samples.append(json.loads(line))
-    DAY_DATA[day_num] = samples
+for days_dir in [EXPOSED_DAYS_DIR, HIDDEN_DAYS_DIR]:
+    if not days_dir.exists():
+        continue
+    for p in sorted(days_dir.glob("day_*.jsonl")):
+        day_num = int(p.stem.split("_")[1])
+        samples = []
+        with open(p) as f:
+            for line in f:
+                samples.append(json.loads(line))
+        DAY_DATA[day_num] = samples
 
 
 @app.route("/actions")
@@ -63,7 +67,11 @@ def submit_day(day_num):
     """
     Submit predictions for a day. Expects JSON:
       {"predictions": [{"id": 0, "action_id": "slack_send_message"}, ...]}
-    Returns accuracy and per-category breakdown.
+
+    For ranked predictions (top-k), use action_ids instead of action_id:
+      {"predictions": [{"id": 0, "action_ids": ["slack_send_message", "teams_send_message"]}, ...]}
+
+    Returns accuracy, per-category breakdown, mistakes, and (if ranked) top-3 accuracy and MRR.
     """
     if day_num not in DAY_DATA:
         return jsonify({"error": f"Day {day_num} not found"}), 404
@@ -72,22 +80,53 @@ def submit_day(day_num):
     if not body or "predictions" not in body:
         return jsonify({"error": "Expected {predictions: [{id, action_id}, ...]}"}), 400
 
-    preds = {p["id"]: p["action_id"] for p in body["predictions"]}
+    # Parse predictions - support both action_id (single) and action_ids (ranked)
+    preds_single = {}
+    preds_ranked = {}
+    has_ranked = False
+    for p in body["predictions"]:
+        pid = p["id"]
+        if "action_ids" in p:
+            has_ranked = True
+            preds_ranked[pid] = p["action_ids"]
+            preds_single[pid] = p["action_ids"][0] if p["action_ids"] else None
+        else:
+            preds_single[pid] = p.get("action_id")
+
     ground_truth = DAY_DATA[day_num]
+    action_cat = {a["id"]: a["category"] for a in ACTIONS}
 
     correct = 0
     total = len(ground_truth)
     cat_correct = {}
     cat_total = {}
-
-    action_cat = {a["id"]: a["category"] for a in ACTIONS}
+    mistakes = []
+    top3_correct = 0
+    rr_sum = 0.0
 
     for i, sample in enumerate(ground_truth):
         cat = action_cat.get(sample["action_id"], "unknown")
         cat_total[cat] = cat_total.get(cat, 0) + 1
-        if preds.get(i) == sample["action_id"]:
+        expected = sample["action_id"]
+        predicted = preds_single.get(i)
+
+        if predicted == expected:
             correct += 1
             cat_correct[cat] = cat_correct.get(cat, 0) + 1
+        else:
+            mistakes.append({
+                "id": i,
+                "query": sample["query"],
+                "predicted": predicted,
+                "expected": expected,
+            })
+
+        if has_ranked and i in preds_ranked:
+            ranked = preds_ranked[i]
+            if expected in ranked[:3]:
+                top3_correct += 1
+            if expected in ranked:
+                rr_sum += 1.0 / (ranked.index(expected) + 1)
 
     accuracy = correct / total if total > 0 else 0
     per_category = {}
@@ -98,17 +137,24 @@ def submit_day(day_num):
             "accuracy": cat_correct.get(cat, 0) / cat_total[cat],
         }
 
-    return jsonify({
+    result = {
         "day": day_num,
         "accuracy": round(accuracy, 4),
         "correct": correct,
         "total": total,
         "per_category": per_category,
-    })
+        "mistakes": mistakes,
+    }
+
+    if has_ranked:
+        result["top_3_accuracy"] = round(top3_correct / total, 4) if total > 0 else 0
+        result["mrr"] = round(rr_sum / total, 4) if total > 0 else 0
+
+    return jsonify(result)
 
 
 if __name__ == "__main__":
-    print(f"Action Search Eval Server")
+    print("Action Search Eval Server")
     print(f"  {len(ACTIONS)} actions loaded")
     print(f"  {len(TRAIN_DATA)} training samples")
     print(f"  {len(DAY_DATA)} daily batches")

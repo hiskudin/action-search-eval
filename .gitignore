@@ -11,3 +11,4 @@ venv/
 *.bin
 model_cache/
 .DS_Store
+_internal/

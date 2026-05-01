@@ -7,6 +7,7 @@ Build a system that matches natural language queries to the correct connector ac
 You are given:
 - A **catalog of 31 actions** across various connectors (Slack, BambooHR, Salesforce, etc.) in `data/actions.json`
 - **Labeled training data** of (query, action_id) pairs in `data/train.jsonl`
+- **Labeled evaluation data** for days 1-10 in `data/days/` (you're encouraged to examine these)
 - A **server** (`server.py`) that serves daily evaluation batches
 
 Your job: build a model/pipeline that takes a natural language query (e.g. *"send a message to the team channel"*) and returns the correct `action_id` (e.g. `slack_send_message`).
@@ -14,14 +15,18 @@ Your job: build a model/pipeline that takes a natural language query (e.g. *"sen
 ## Setup
 
 ```bash
-pip install -r requirements.txt
+# Install uv if you don't have it
+curl -LsSf https://astral.sh/uv/install.sh | sh
+
+# Install dependencies
+uv sync
 ```
 
 ## Workflow
 
 1. **Start the server:**
    ```bash
-   python server.py
+   uv run python server.py
    ```
 
 2. **Explore the data:**
@@ -33,7 +38,7 @@ pip install -r requirements.txt
 
 4. **Submit predictions:**
    ```bash
-   python evaluate.py --day 1
+   uv run python evaluate.py --day 1
    ```
    Or POST directly:
    ```bash
@@ -41,9 +46,10 @@ pip install -r requirements.txt
      -H "Content-Type: application/json" \
      -d '{"predictions": [{"id": 0, "action_id": "slack_send_message"}, ...]}'
    ```
-   The server returns accuracy and per-category breakdown.
+   The server returns accuracy, per-category breakdown, and a list of mistakes.
+   For ranked predictions (top-k), submit `action_ids` instead of `action_id` to get top-3 accuracy and MRR.
 
-5. **Evaluate across all 10 days.** Each day is a separate batch. Your aggregate performance across all days is what matters.
+5. **Evaluate across all 10 days.** Each day is a separate batch. Your aggregate performance matters, plus a held-out set you won't see.
 
 ## Data Format
 
@@ -65,14 +71,17 @@ pip install -r requirements.txt
 ## What We Evaluate
 
 - Accuracy across all 10 days
+- Accuracy on a held-out test set you won't have access to
 - Quality and clarity of your approach
-- How you handle the pipeline end to end
+- How you handle the pipeline end to end (Observability/Monitoring)
+
 
 ## Guidelines
 
-- Keep it simple. Refer to `CLAUDE.md` for coding principles.
+- Keep it simple.
 - Use whatever libraries or approaches you like.
 - The baseline uses `all-MiniLM-L6-v2` but you're free to use any model.
-- You have ~2 hours.
+- Spend around ~2 hours.
+- LLM use encouraged but you are be responsible for all output.
 
-Good luck.
+Have fun.
