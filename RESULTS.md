@@ -152,3 +152,34 @@ Best is a wash with V2 (66.1% dev vs 66.3%). Going wider (cand_k=20–30) active
 **Why this didn't work.** `bge-reranker-base` is trained on web-style query↔passage relevance, not "match a paraphrased intent to a tool action." The bi-encoder kNN over labeled training queries is already an unusually strong signal for this task — the training set is essentially a collection of (query, action) exemplars hand-built to disambiguate connectors and verbs, which is exactly the kind of supervision a reranker would *need* in-domain to be useful. With no fine-tuning, off-the-shelf rerankers can only add noise.
 
 **Skipping V3 in the final pipeline.** Holding at V2.
+
+## V4 — Lexical fusion + encoder swap
+
+`models/v4_hybrid.py`. Two probes in one file:
+1. Add a TF-IDF (word 1–2grams, sublinear TF) index over train queries + action `connector + label + description`. Fuse with V2 via reciprocal rank fusion (RRF), tuning k.
+2. Swap encoder MiniLM → `BAAI/bge-small-en-v1.5`.
+
+| variant | dev | val |
+|---|---|---|
+| **MiniLM dense-only (= V2)** | **66.3%** | **68.0%** |
+| MiniLM + TFIDF, RRF k=60 | 65.8% | 68.0% |
+| MiniLM + TFIDF, RRF k=30 | 65.8% | 68.0% |
+| bge-small dense-only | 62.3% | 65.0% |
+| bge-small + TFIDF, RRF k=60 | 64.1% | 70.0% |
+
+**Lexical fusion**: −0.5pt dev, flat val. The cases where query and action share rare tokens (e.g. "slack", "drive") were already inside top-K dense neighbors, so TFIDF re-ranking doesn't add new candidates. Discarded.
+
+**Encoder swap**: bge-small underperforms MiniLM by ~4pt dense-only. Surprising at first, but bge-small is trained for *asymmetric* retrieval (short query → long passage); our task is closer to *symmetric* paraphrase matching (short query → short query), which MiniLM was trained on. The bge-small + TFIDF result (70% val, −2.2pt dev) is best on val but I treat that as noise on a 100-sample holdout — dev is the larger, more reliable target.
+
+**Skipping V4 in the final pipeline.**
+
+## Final pipeline
+
+V2 (kNN k=10 over train queries + Laplace-smoothed log-prior, λ=0.1) folded into `evaluate.py`. All days: **66.7%**, val (9–10): **68.0%** — a +33.4pt absolute lift over the baseline's 33.3%.
+
+### What I'd try next given more time
+
+- **Synthetic train query expansion.** Use an LLM to generate 5–10 paraphrases per action_id, append to the kNN index. The connector-ambiguity error family is fundamentally a label-density problem — more exemplars is the most direct fix.
+- **Fine-tune the bi-encoder** on (train_query, action_label) using contrastive loss with in-batch negatives. ~193 pairs is small but with hard negatives sampled from same-verb-different-connector pairs it could lift the dominant error family.
+- **Train a logistic regression on top of dense + lexical features** rather than RRF. Cleaner way to weight signals and to learn a real per-action prior.
+- **A small, instruction-tuned LLM in the loop** for low-margin queries only (e.g. when V2's top-1 vs top-2 score gap < threshold), with the candidate action descriptions in the prompt. Avoid LLM for the easy 60%+ that V2 already gets right.

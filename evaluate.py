@@ -38,14 +38,44 @@ def main():
     parser.add_argument("--day", type=int, default=None, help="Single day to evaluate (default: all available)")
     args = parser.parse_args()
 
-    # ── Load the baseline model ──
-    # Replace this section with your own model.
+    # ── Model: kNN over labeled train queries + log-prior from train frequency ──
+    # See RESULTS.md for the full iteration log. The baseline scored 33.3% on
+    # days 1-10; this pipeline scores 66.7% (+33.4pt absolute).
+    import json
+    from collections import Counter
+    from pathlib import Path
+
+    import numpy as np
     from sentence_transformers import SentenceTransformer
-    from baseline import load_actions, build_action_index, predict, MODEL_NAME
+
+    MODEL_NAME = "sentence-transformers/all-MiniLM-L6-v2"
+    K = 10
+    PRIOR_LAMBDA = 0.1
+    DATA_DIR = Path(__file__).parent / "data"
+
+    with open(DATA_DIR / "actions.json") as f:
+        actions = json.load(f)
+    with open(DATA_DIR / "train.jsonl") as f:
+        train = [json.loads(l) for l in f]
+
+    action_ids = [a["id"] for a in actions]
+    counts = Counter(s["action_id"] for s in train)
+    total = sum(counts.values()) + len(action_ids)
+    log_prior = {aid: np.log((counts.get(aid, 0) + 1) / total) for aid in action_ids}
 
     model = SentenceTransformer(MODEL_NAME)
-    actions = load_actions()
-    action_embs, action_ids = build_action_index(model, actions)
+    train_queries = [s["query"] for s in train]
+    train_labels = [s["action_id"] for s in train]
+    train_embs = model.encode(train_queries, normalize_embeddings=True, show_progress_bar=False)
+
+    def predict_query(query: str) -> str:
+        q = model.encode([query], normalize_embeddings=True, show_progress_bar=False)
+        sims = (q @ train_embs.T)[0]
+        top_idx = np.argpartition(-sims, K)[:K]
+        scores = {aid: PRIOR_LAMBDA * log_prior[aid] for aid in action_ids}
+        for i in top_idx:
+            scores[train_labels[i]] += float(sims[i])
+        return max(scores, key=scores.get)
 
     # Determine which days to run
     if args.day is not None:
@@ -65,8 +95,7 @@ def main():
 
         predictions = []
         for q in queries:
-            predicted_action = predict(model, action_embs, action_ids, q["query"])
-            predictions.append({"id": q["id"], "action_id": predicted_action})
+            predictions.append({"id": q["id"], "action_id": predict_query(q["query"])})
 
         result = submit_predictions(day, predictions)
         results[day] = result
