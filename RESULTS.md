@@ -81,3 +81,43 @@ Adding action descriptions as weight-0.5 rows didn't help — train queries domi
 | **all days** | **65.9%** | 498 |
 
 **Δ vs V0: +32.6pt on all days, +35.0pt on val.** Confirms diagnosis #3 — paraphrased queries cluster around train queries far better than around action descriptions. Train accuracy dropped from 94.8% (k=5 incl. self-match) to 85.5% (k=10 spreads vote across more neighbors), which is fine — train accuracy isn't the goal.
+
+## V2 — kNN + log-prior from train action frequency
+
+`models/v2_prior.py`. Hypothesis from V0 diagnosis: ~50% of errors were "right verb, wrong connector". Idea: nudge ambiguous predictions toward more-trained actions via `score(a) += λ · log P(a)` where `P(a)` is Laplace-smoothed train frequency.
+
+**Sanity check before tuning**: train action counts range 5–11 (low spread, σ=1.86), days 1–10 counts range 4–30 (much wider). Pearson corr between train and day frequencies = 0.69 — directionally aligned but train is too uniform to encode the day skew well. So the prior is mathematically sound but expected to be weak.
+
+Sweep on dev (days 1–8):
+
+| λ | dev | val |
+|---|---|---|
+| 0.00 | 65.3% | 68.0% |
+| 0.02 | 65.6% | 67.0% |
+| 0.05 | 65.6% | 67.0% |
+| **0.10** | **66.3%** | **68.0%** |
+| 0.20 | 64.8% | 66.0% |
+| 0.50 | 60.6% | 61.0% |
+
+Picked λ=0.1.
+
+### Numbers
+
+| split | acc | n |
+|---|---|---|
+| train | 85.0% | 193 |
+| day01 | 72.0% | 50 |
+| day02 | 70.0% | 50 |
+| day03 | 76.0% | 50 |
+| day04 | 66.0% | 50 |
+| day05 | 59.2% | 49 |
+| day06 | 66.0% | 50 |
+| day07 | 62.0% | 50 |
+| day08 | 59.2% | 49 |
+| day09 | 62.0% | 50 |
+| day10 | 74.0% | 50 |
+| **dev (1–8)** | **66.3%** | 398 |
+| **val (9–10)** | **68.0%** | 100 |
+| **all days** | **66.7%** | 498 |
+
+**Δ vs V1: +1.0pt dev, +0.0pt val.** Tiny but real on dev. As predicted, the train distribution is too flat to act as a strong prior — the day distribution has actions appearing 4–30 times that train has 5–11 times, so the prior is a coarse approximation. Keeping it (cheap, doesn't hurt val), but the connector-ambiguity error family is still mostly intact and is the main thing for V3 to attack.
