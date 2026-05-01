@@ -121,3 +121,34 @@ Picked λ=0.1.
 | **all days** | **66.7%** | 498 |
 
 **Δ vs V1: +1.0pt dev, +0.0pt val.** Tiny but real on dev. As predicted, the train distribution is too flat to act as a strong prior — the day distribution has actions appearing 4–30 times that train has 5–11 times, so the prior is a coarse approximation. Keeping it (cheap, doesn't hurt val), but the connector-ambiguity error family is still mostly intact and is the main thing for V3 to attack.
+
+## V3 — Cross-encoder reranker (negative result)
+
+`models/v3_rerank.py` and `models/v3b_rerank_train.py`. Cross-encoder = `BAAI/bge-reranker-base`.
+
+**V3a — rerank action text.** Take V2's top-N action candidates, rerank with `(query, "Label: description [Examples: ...]")`. Tried both fusion (`V2_score + α · softmax(rerank)`) and pure-rerank.
+
+| variant | dev | val |
+|---|---|---|
+| pure rerank, top_n=3, no examples | 50.8% | 58.0% |
+| pure rerank, top_n=5, with examples | 54.8% | 55.0% |
+| **V2 alone (α=0)** | **66.3%** | **68.0%** |
+| fusion, top_n=5, α=0.05–0.5 | 66.3% | 68.0% |
+| fusion, top_n=5, α=1.0 | 65.6% | 67.0% |
+
+Pure rerank loses 10+ points vs V2. Fusion is flat for all useful α — the V2 score dominates and any meaningful α weight from the reranker actively hurts.
+
+**V3b — rerank training-query pairs.** Bi-encoder gets top-K=20 train neighbors, cross-encoder reranks `(query, train_query)`, scores aggregated per action_id.
+
+| cand_k | α | dev | val |
+|---|---|---|---|
+| 10 | 0.5 | 65.1% | 69.0% |
+| 10 | 1.0 | 66.1% | 68.0% |
+| 20 | 1.0 | 55.3% | 55.0% |
+| 30 | 1.0 | 51.5% | 48.0% |
+
+Best is a wash with V2 (66.1% dev vs 66.3%). Going wider (cand_k=20–30) actively hurts because the reranker's score distribution becomes noisy across many marginal candidates.
+
+**Why this didn't work.** `bge-reranker-base` is trained on web-style query↔passage relevance, not "match a paraphrased intent to a tool action." The bi-encoder kNN over labeled training queries is already an unusually strong signal for this task — the training set is essentially a collection of (query, action) exemplars hand-built to disambiguate connectors and verbs, which is exactly the kind of supervision a reranker would *need* in-domain to be useful. With no fine-tuning, off-the-shelf rerankers can only add noise.
+
+**Skipping V3 in the final pipeline.** Holding at V2.
