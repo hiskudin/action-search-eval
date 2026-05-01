@@ -43,3 +43,41 @@ Three error families:
 - (1) → connector prior from train frequency, or richer action text.
 - (2) → cross-encoder reranker on top-k.
 - (3) → kNN over training queries (predicted to be the single biggest lift).
+
+## V1 — kNN over training queries
+
+`models/v1_knn.py`. Same MiniLM encoder. Index = the 193 train queries (no action-description rows). For each query, take top-k=10 nearest train queries by cosine, sum similarities per action_id, predict the argmax.
+
+Hyperparameter sweep on dev (days 1–8):
+
+| variant | dev | val |
+|---|---|---|
+| k=1, train-only | 53.0% | 56.0% |
+| k=3, train-only | 57.5% | 54.0% |
+| k=5, train-only | 65.1% | 63.0% |
+| **k=10, train-only** | **65.3%** | **68.0%** |
+| k=5, train + actions | 64.1% | 66.0% |
+| k=10, train + actions | 65.3% | 66.0% |
+
+Adding action descriptions as weight-0.5 rows didn't help — train queries dominate the signal already. Picked k=10, train-only.
+
+### Numbers
+
+| split | acc | n |
+|---|---|---|
+| train | 85.5% | 193 |
+| day01 | 72.0% | 50 |
+| day02 | 70.0% | 50 |
+| day03 | 76.0% | 50 |
+| day04 | 64.0% | 50 |
+| day05 | 59.2% | 49 |
+| day06 | 62.0% | 50 |
+| day07 | 60.0% | 50 |
+| day08 | 59.2% | 49 |
+| day09 | 62.0% | 50 |
+| day10 | 74.0% | 50 |
+| **dev (1–8)** | **65.3%** | 398 |
+| **val (9–10)** | **68.0%** | 100 |
+| **all days** | **65.9%** | 498 |
+
+**Δ vs V0: +32.6pt on all days, +35.0pt on val.** Confirms diagnosis #3 — paraphrased queries cluster around train queries far better than around action descriptions. Train accuracy dropped from 94.8% (k=5 incl. self-match) to 85.5% (k=10 spreads vote across more neighbors), which is fine — train accuracy isn't the goal.
