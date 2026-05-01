@@ -8,7 +8,8 @@ This shows candidates the expected workflow:
   4. Get your score
 
 Usage:
-    python evaluate.py --day 1
+    python evaluate.py            # run all available days
+    python evaluate.py --day 3    # run a single day
 """
 import argparse
 import json
@@ -33,10 +34,12 @@ def submit_predictions(day: int, predictions: list[dict]) -> dict:
 
 
 def main():
-    parser = argparse.ArgumentParser(description="Evaluate your model against a daily batch")
-    parser.add_argument("--day", type=int, required=True, help="Day number (1-10)")
+    parser = argparse.ArgumentParser(description="Evaluate your model against daily batches")
+    parser.add_argument("--day", type=int, default=None, help="Single day to evaluate (default: all available)")
     args = parser.parse_args()
 
+    # ── Load the baseline model ──
+    # Replace this section with your own model.
     from sentence_transformers import SentenceTransformer
     from baseline import load_actions, build_action_index, predict, MODEL_NAME
 
@@ -44,19 +47,39 @@ def main():
     actions = load_actions()
     action_embs, action_ids = build_action_index(model, actions)
 
-    queries = fetch_queries(args.day)
-    print(f"Day {args.day}: {len(queries)} queries")
+    # Determine which days to run
+    if args.day is not None:
+        days = [args.day]
+    else:
+        days = list(range(1, 11))
 
-    predictions = []
-    for q in queries:
-        predicted_action = predict(model, action_embs, action_ids, q["query"])
-        predictions.append({"id": q["id"], "action_id": predicted_action})
+    total_correct = 0
+    total_queries = 0
+    results = {}
 
-    result = submit_predictions(args.day, predictions)
-    print(f"Accuracy: {result['accuracy']:.1%} ({result['correct']}/{result['total']})")
-    print("Per category:")
-    for cat, stats in result["per_category"].items():
-        print(f"  {cat}: {stats['accuracy']:.1%} ({stats['correct']}/{stats['total']})")
+    for day in days:
+        try:
+            queries = fetch_queries(day)
+        except requests.HTTPError:
+            continue
+
+        predictions = []
+        for q in queries:
+            predicted_action = predict(model, action_embs, action_ids, q["query"])
+            predictions.append({"id": q["id"], "action_id": predicted_action})
+
+        result = submit_predictions(day, predictions)
+        results[day] = result
+        total_correct += result["correct"]
+        total_queries += result["total"]
+
+        print(f"Day {day:2d}: {result['accuracy']:.1%} ({result['correct']}/{result['total']})")
+        for cat, stats in result["per_category"].items():
+            print(f"       {cat}: {stats['accuracy']:.1%} ({stats['correct']}/{stats['total']})")
+
+    if len(results) > 1:
+        overall = total_correct / total_queries if total_queries else 0
+        print(f"\nOverall: {overall:.1%} ({total_correct}/{total_queries}) across {len(results)} days")
 
 
 if __name__ == "__main__":
