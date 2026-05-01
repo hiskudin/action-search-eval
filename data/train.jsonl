@@ -1,0 +1,249 @@
+{"query": "retrieve employee data from bamboo", "action_id": "bamboo_get_employee"}
+{"query": "get someone's HR record", "action_id": "bamboo_get_employee"}
+{"query": "change employee info in workday", "action_id": "workday_update_worker"}
+{"query": "get employee details from bamboohr", "action_id": "bamboo_get_employee"}
+{"query": "get files from google drive", "action_id": "gdrive_list_files"}
+{"query": "send a chat in teams", "action_id": "teams_send_message"}
+{"query": "get my gcal schedule", "action_id": "gcal_list_events"}
+{"query": "look up someone's employee info", "action_id": "bamboo_get_employee"}
+{"query": "list all employees in bamboohr", "action_id": "bamboo_list_employees"}
+{"query": "register a lead in salesforce", "action_id": "salesforce_create_lead"}
+{"query": "register a new hire in bamboohr", "action_id": "bamboo_create_employee"}
+{"query": "let the team know about the update", "action_id": "slack_send_message"}
+{"query": "get the company directory", "action_id": "bamboo_list_employees"}
+{"query": "edit workday worker profile", "action_id": "workday_update_worker"}
+{"query": "message someone on teams", "action_id": "teams_send_message"}
+{"query": "get my gcal schedule", "action_id": "gcal_list_events"}
+{"query": "browse google drive contents", "action_id": "gdrive_list_files"}
+{"query": "fetch the full employee list from bamboo", "action_id": "bamboo_list_employees"}
+{"query": "check a greenhouse application", "action_id": "greenhouse_get_application"}
+{"query": "create a new employee in bamboohr", "action_id": "bamboo_create_employee"}
+{"query": "attach a document to slack", "action_id": "slack_upload_file"}
+{"query": "get all channels from slack", "action_id": "slack_list_channels"}
+{"query": "add a channel in microsoft teams", "action_id": "teams_create_channel"}
+{"query": "add a potential customer", "action_id": "salesforce_create_lead"}
+{"query": "create a new teams channel", "action_id": "teams_create_channel"}
+{"query": "share a dropbox file with someone", "action_id": "dropbox_share_file"}
+{"query": "check a greenhouse application", "action_id": "greenhouse_get_application"}
+{"query": "add a sales lead to salesforce", "action_id": "salesforce_create_lead"}
+{"query": "send a chat in teams", "action_id": "teams_send_message"}
+{"query": "add an outlook calendar event", "action_id": "outlook_create_event"}
+{"query": "onboard a new employee in bamboo", "action_id": "bamboo_create_employee"}
+{"query": "add a file to dropbox", "action_id": "dropbox_upload_file"}
+{"query": "post in the general channel", "action_id": "slack_send_message"}
+{"query": "change employee info in workday", "action_id": "workday_update_worker"}
+{"query": "list all slack channels", "action_id": "slack_list_channels"}
+{"query": "show all bamboohr employees", "action_id": "bamboo_list_employees"}
+{"query": "add a file to dropbox", "action_id": "dropbox_upload_file"}
+{"query": "browse google drive contents", "action_id": "gdrive_list_files"}
+{"query": "get the account list from salesforce", "action_id": "salesforce_list_accounts"}
+{"query": "find employee details in bamboohr", "action_id": "bamboo_get_employee"}
+{"query": "look up a worker in workday", "action_id": "workday_get_worker"}
+{"query": "update worker details in workday", "action_id": "workday_update_worker"}
+{"query": "register a new hire in bamboohr", "action_id": "bamboo_create_employee"}
+{"query": "get contact details from hubspot", "action_id": "hubspot_get_contact"}
+{"query": "upload the report to slack", "action_id": "slack_upload_file"}
+{"query": "get the employee directory from bamboo", "action_id": "bamboo_list_employees"}
+{"query": "share a file on the slack channel", "action_id": "slack_upload_file"}
+{"query": "list open opportunities in lever", "action_id": "lever_list_opportunities"}
+{"query": "send a file to the team on slack", "action_id": "slack_upload_file"}
+{"query": "list all employees in bamboohr", "action_id": "bamboo_list_employees"}
+{"query": "save a document to google drive", "action_id": "gdrive_upload_file"}
+{"query": "file a jira ticket", "action_id": "jira_create_issue"}
+{"query": "get the employee directory from bamboo", "action_id": "bamboo_list_employees"}
+{"query": "create a candidate in lever", "action_id": "lever_create_candidate"}
+{"query": "get the employee directory from bamboo", "action_id": "bamboo_list_employees"}
+{"query": "make a teams channel for the project", "action_id": "teams_create_channel"}
+{"query": "fetch outlook schedule", "action_id": "outlook_get_schedule"}
+{"query": "message the engineering team on slack", "action_id": "slack_send_message"}
+{"query": "browse google drive contents", "action_id": "gdrive_list_files"}
+{"query": "write a teams message to the project group", "action_id": "teams_send_message"}
+{"query": "submit a candidate profile to lever", "action_id": "lever_create_candidate"}
+{"query": "send a message in microsoft teams", "action_id": "teams_send_message"}
+{"query": "share the document externally", "action_id": "dropbox_share_file"}
+{"query": "create an event in google calendar", "action_id": "gcal_create_event"}
+{"query": "list files in google drive", "action_id": "gdrive_list_files"}
+{"query": "add a file to dropbox", "action_id": "dropbox_upload_file"}
+{"query": "look up employee info in bamboohr", "action_id": "bamboo_get_employee"}
+{"query": "fetch slack channel list", "action_id": "slack_list_channels"}
+{"query": "change employee info in workday", "action_id": "workday_update_worker"}
+{"query": "share a file from dropbox", "action_id": "dropbox_share_file"}
+{"query": "update worker details in workday", "action_id": "workday_update_worker"}
+{"query": "look up a worker in workday", "action_id": "workday_get_worker"}
+{"query": "see availability in outlook calendar", "action_id": "outlook_get_schedule"}
+{"query": "update worker details in workday", "action_id": "workday_update_worker"}
+{"query": "fetch a contact from hubspot", "action_id": "hubspot_get_contact"}
+{"query": "open a new jira issue", "action_id": "jira_create_issue"}
+{"query": "upload a file to google drive", "action_id": "gdrive_upload_file"}
+{"query": "set up a new hire", "action_id": "bamboo_create_employee"}
+{"query": "look up a salesforce contact", "action_id": "salesforce_get_contact"}
+{"query": "add a calendar event to gcal", "action_id": "gcal_create_event"}
+{"query": "ping the team on microsoft", "action_id": "teams_send_message"}
+{"query": "send a message to the team channel on slack", "action_id": "slack_send_message"}
+{"query": "fetch an employee record from bamboo", "action_id": "bamboo_get_employee"}
+{"query": "fetch contact details from salesforce", "action_id": "salesforce_get_contact"}
+{"query": "show accounts in salesforce", "action_id": "salesforce_list_accounts"}
+{"query": "create a dropbox share link", "action_id": "dropbox_share_file"}
+{"query": "show files in a gdrive folder", "action_id": "gdrive_list_files"}
+{"query": "share a file from dropbox", "action_id": "dropbox_share_file"}
+{"query": "post in the general channel", "action_id": "slack_send_message"}
+{"query": "save a document to google drive", "action_id": "gdrive_upload_file"}
+{"query": "what channels do we have on slack", "action_id": "slack_list_channels"}
+{"query": "add a channel in microsoft teams", "action_id": "teams_create_channel"}
+{"query": "post a message on slack", "action_id": "slack_send_message"}
+{"query": "add a file to dropbox", "action_id": "dropbox_upload_file"}
+{"query": "fetch the full employee list from bamboo", "action_id": "bamboo_list_employees"}
+{"query": "list all slack channels", "action_id": "slack_list_channels"}
+{"query": "browse available channels", "action_id": "slack_list_channels"}
+{"query": "create a new lead in salesforce", "action_id": "salesforce_create_lead"}
+{"query": "retrieve workday worker record", "action_id": "workday_get_worker"}
+{"query": "list events from google calendar", "action_id": "gcal_list_events"}
+{"query": "show all bamboohr employees", "action_id": "bamboo_list_employees"}
+{"query": "send a message to the team channel on slack", "action_id": "slack_send_message"}
+{"query": "check free busy status in outlook", "action_id": "outlook_get_schedule"}
+{"query": "fetch slack channel list", "action_id": "slack_list_channels"}
+{"query": "message the engineering team on slack", "action_id": "slack_send_message"}
+{"query": "add a file to dropbox", "action_id": "dropbox_upload_file"}
+{"query": "send a file to the team on slack", "action_id": "slack_upload_file"}
+{"query": "upload the report to slack", "action_id": "slack_upload_file"}
+{"query": "get the employee directory from bamboo", "action_id": "bamboo_list_employees"}
+{"query": "post a teams message", "action_id": "teams_send_message"}
+{"query": "show me the channels in our slack workspace", "action_id": "slack_list_channels"}
+{"query": "look up someone's employee info", "action_id": "bamboo_get_employee"}
+{"query": "create an event in outlook calendar", "action_id": "outlook_create_event"}
+{"query": "add a bug to jira", "action_id": "jira_create_issue"}
+{"query": "create a candidate in lever", "action_id": "lever_create_candidate"}
+{"query": "write a message to the dev slack channel", "action_id": "slack_send_message"}
+{"query": "set up a google calendar event", "action_id": "gcal_create_event"}
+{"query": "onboard a new employee in bamboo", "action_id": "bamboo_create_employee"}
+{"query": "what channels do we have on slack", "action_id": "slack_list_channels"}
+{"query": "write a teams message to the project group", "action_id": "teams_send_message"}
+{"query": "find employee details in bamboohr", "action_id": "bamboo_get_employee"}
+{"query": "add an employee record to bamboo", "action_id": "bamboo_create_employee"}
+{"query": "list all slack channels", "action_id": "slack_list_channels"}
+{"query": "send a slack message to john", "action_id": "slack_send_message"}
+{"query": "post in the general channel", "action_id": "slack_send_message"}
+{"query": "add a calendar event to gcal", "action_id": "gcal_create_event"}
+{"query": "register a new hire in bamboohr", "action_id": "bamboo_create_employee"}
+{"query": "see what groups we have", "action_id": "slack_list_channels"}
+{"query": "message the engineering team on slack", "action_id": "slack_send_message"}
+{"query": "add an outlook calendar event", "action_id": "outlook_create_event"}
+{"query": "get the company directory", "action_id": "bamboo_list_employees"}
+{"query": "set up a google calendar event", "action_id": "gcal_create_event"}
+{"query": "share a dropbox file with someone", "action_id": "dropbox_share_file"}
+{"query": "list all slack channels", "action_id": "slack_list_channels"}
+{"query": "add a file to dropbox", "action_id": "dropbox_upload_file"}
+{"query": "fetch slack channel list", "action_id": "slack_list_channels"}
+{"query": "edit workday worker profile", "action_id": "workday_update_worker"}
+{"query": "add something to the outlook calendar", "action_id": "outlook_create_event"}
+{"query": "update worker details in workday", "action_id": "workday_update_worker"}
+{"query": "create a new employee in bamboohr", "action_id": "bamboo_create_employee"}
+{"query": "upload a file to google drive", "action_id": "gdrive_upload_file"}
+{"query": "message someone on teams", "action_id": "teams_send_message"}
+{"query": "send a file to the team on slack", "action_id": "slack_upload_file"}
+{"query": "see current hiring opportunities", "action_id": "lever_list_opportunities"}
+{"query": "pull up worker information", "action_id": "workday_get_worker"}
+{"query": "fetch a contact from hubspot", "action_id": "hubspot_get_contact"}
+{"query": "reach out to engineering", "action_id": "slack_send_message"}
+{"query": "register a new hire in bamboohr", "action_id": "bamboo_create_employee"}
+{"query": "list open opportunities in lever", "action_id": "lever_list_opportunities"}
+{"query": "add a deal to hubspot", "action_id": "hubspot_create_deal"}
+{"query": "list files in google drive", "action_id": "gdrive_list_files"}
+{"query": "list events from google calendar", "action_id": "gcal_list_events"}
+{"query": "onboard a new employee in bamboo", "action_id": "bamboo_create_employee"}
+{"query": "what channels do we have on slack", "action_id": "slack_list_channels"}
+{"query": "create a task in asana", "action_id": "asana_create_task"}
+{"query": "get all channels from slack", "action_id": "slack_list_channels"}
+{"query": "edit workday worker profile", "action_id": "workday_update_worker"}
+{"query": "change employee info in workday", "action_id": "workday_update_worker"}
+{"query": "set up a google calendar event", "action_id": "gcal_create_event"}
+{"query": "list all candidates in greenhouse", "action_id": "greenhouse_list_candidates"}
+{"query": "look up employee info in bamboohr", "action_id": "bamboo_get_employee"}
+{"query": "find employee details in bamboohr", "action_id": "bamboo_get_employee"}
+{"query": "get all channels from slack", "action_id": "slack_list_channels"}
+{"query": "add a channel in microsoft teams", "action_id": "teams_create_channel"}
+{"query": "check free busy status in outlook", "action_id": "outlook_get_schedule"}
+{"query": "update worker details in workday", "action_id": "workday_update_worker"}
+{"query": "update worker details in workday", "action_id": "workday_update_worker"}
+{"query": "fetch worker details from workday", "action_id": "workday_get_worker"}
+{"query": "schedule a meeting in outlook", "action_id": "outlook_create_event"}
+{"query": "get my gcal schedule", "action_id": "gcal_list_events"}
+{"query": "get worker info from workday", "action_id": "workday_get_worker"}
+{"query": "create a dropbox share link", "action_id": "dropbox_share_file"}
+{"query": "edit workday worker profile", "action_id": "workday_update_worker"}
+{"query": "save a file to dropbox", "action_id": "dropbox_upload_file"}
+{"query": "upload the report to slack", "action_id": "slack_upload_file"}
+{"query": "send a file to the team on slack", "action_id": "slack_upload_file"}
+{"query": "fetch an employee record from bamboo", "action_id": "bamboo_get_employee"}
+{"query": "upload a file to dropbox", "action_id": "dropbox_upload_file"}
+{"query": "get worker info from workday", "action_id": "workday_get_worker"}
+{"query": "create a new employee in bamboohr", "action_id": "bamboo_create_employee"}
+{"query": "share a file on the slack channel", "action_id": "slack_upload_file"}
+{"query": "create an event in google calendar", "action_id": "gcal_create_event"}
+{"query": "schedule a meeting on google calendar", "action_id": "gcal_create_event"}
+{"query": "register a lead in salesforce", "action_id": "salesforce_create_lead"}
+{"query": "schedule a meeting on google calendar", "action_id": "gcal_create_event"}
+{"query": "upload the report to slack", "action_id": "slack_upload_file"}
+{"query": "fetch all greenhouse candidates", "action_id": "greenhouse_list_candidates"}
+{"query": "put a file on google drive", "action_id": "gdrive_upload_file"}
+{"query": "generate a sharing link for a dropbox file", "action_id": "dropbox_share_file"}
+{"query": "chat with the group", "action_id": "teams_send_message"}
+{"query": "write a teams message to the project group", "action_id": "teams_send_message"}
+{"query": "set up a new channel on teams", "action_id": "teams_create_channel"}
+{"query": "upload the report to slack", "action_id": "slack_upload_file"}
+{"query": "list files in google drive", "action_id": "gdrive_list_files"}
+{"query": "find employee details in bamboohr", "action_id": "bamboo_get_employee"}
+{"query": "show my upcoming google calendar events", "action_id": "gcal_list_events"}
+{"query": "show all bamboohr employees", "action_id": "bamboo_list_employees"}
+{"query": "post a message on slack", "action_id": "slack_send_message"}
+{"query": "create a dropbox share link", "action_id": "dropbox_share_file"}
+{"query": "send a message in microsoft teams", "action_id": "teams_send_message"}
+{"query": "fetch outlook schedule", "action_id": "outlook_get_schedule"}
+{"query": "onboard a new employee in bamboo", "action_id": "bamboo_create_employee"}
+{"query": "onboard a new employee in bamboo", "action_id": "bamboo_create_employee"}
+{"query": "look up employee info in bamboohr", "action_id": "bamboo_get_employee"}
+{"query": "reach out to engineering", "action_id": "slack_send_message"}
+{"query": "show all bamboohr employees", "action_id": "bamboo_list_employees"}
+{"query": "add an asana task", "action_id": "asana_create_task"}
+{"query": "list all employees in bamboohr", "action_id": "bamboo_list_employees"}
+{"query": "add a file to dropbox", "action_id": "dropbox_upload_file"}
+{"query": "look up a worker in workday", "action_id": "workday_get_worker"}
+{"query": "send a chat in teams", "action_id": "teams_send_message"}
+{"query": "see all staff members", "action_id": "bamboo_list_employees"}
+{"query": "show jira tickets for the project", "action_id": "jira_list_issues"}
+{"query": "create a dropbox share link", "action_id": "dropbox_share_file"}
+{"query": "fetch all accounts from salesforce", "action_id": "salesforce_list_accounts"}
+{"query": "create an event in outlook calendar", "action_id": "outlook_create_event"}
+{"query": "create a dropbox share link", "action_id": "dropbox_share_file"}
+{"query": "fetch the full employee list from bamboo", "action_id": "bamboo_list_employees"}
+{"query": "add a new candidate to lever", "action_id": "lever_create_candidate"}
+{"query": "upload the report to slack", "action_id": "slack_upload_file"}
+{"query": "upload a file to slack", "action_id": "slack_upload_file"}
+{"query": "list issues in jira", "action_id": "jira_list_issues"}
+{"query": "get the file over to the channel", "action_id": "slack_upload_file"}
+{"query": "schedule a meeting on google calendar", "action_id": "gcal_create_event"}
+{"query": "create a new teams channel", "action_id": "teams_create_channel"}
+{"query": "send a message in microsoft teams", "action_id": "teams_send_message"}
+{"query": "put a document in dropbox", "action_id": "dropbox_upload_file"}
+{"query": "post a message on slack", "action_id": "slack_send_message"}
+{"query": "register a new hire in bamboohr", "action_id": "bamboo_create_employee"}
+{"query": "add a channel in microsoft teams", "action_id": "teams_create_channel"}
+{"query": "update worker details in workday", "action_id": "workday_update_worker"}
+{"query": "dm someone on slack", "action_id": "slack_send_message"}
+{"query": "create an event in outlook calendar", "action_id": "outlook_create_event"}
+{"query": "share a dropbox file with someone", "action_id": "dropbox_share_file"}
+{"query": "what files do we have stored", "action_id": "gdrive_list_files"}
+{"query": "share a dropbox file with someone", "action_id": "dropbox_share_file"}
+{"query": "fetch outlook schedule", "action_id": "outlook_get_schedule"}
+{"query": "add a calendar event to gcal", "action_id": "gcal_create_event"}
+{"query": "make a teams channel for the project", "action_id": "teams_create_channel"}
+{"query": "get the candidate pipeline from greenhouse", "action_id": "greenhouse_list_candidates"}
+{"query": "list all slack channels", "action_id": "slack_list_channels"}
+{"query": "share a dropbox file with someone", "action_id": "dropbox_share_file"}
+{"query": "set up a new channel on teams", "action_id": "teams_create_channel"}
+{"query": "modify a worker record in workday", "action_id": "workday_update_worker"}
+{"query": "register a lead in salesforce", "action_id": "salesforce_create_lead"}
+{"query": "save a document to google drive", "action_id": "gdrive_upload_file"}
+{"query": "show me the channels in our slack workspace", "action_id": "slack_list_channels"}
+{"query": "generate a sharing link for a dropbox file", "action_id": "dropbox_share_file"}
+{"query": "post a message on slack", "action_id": "slack_send_message"}

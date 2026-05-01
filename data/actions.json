@@ -1,0 +1,39 @@
+[
+  {"id": "slack_send_message", "connector": "slack", "label": "Send Message", "description": "Send a message to a Slack channel or user", "category": "messaging"},
+  {"id": "slack_list_channels", "connector": "slack", "label": "List Channels", "description": "List all channels in a Slack workspace", "category": "messaging"},
+  {"id": "teams_send_message", "connector": "teams", "label": "Send Teams Message", "description": "Send a message in Microsoft Teams", "category": "messaging"},
+  {"id": "teams_create_channel", "connector": "teams", "label": "Create Teams Channel", "description": "Create a new channel in Microsoft Teams", "category": "messaging"},
+  {"id": "slack_upload_file", "connector": "slack", "label": "Upload File to Slack", "description": "Upload a file to a Slack channel", "category": "messaging"},
+
+  {"id": "bamboo_get_employee", "connector": "bamboohr", "label": "Get Employee", "description": "Get employee details from BambooHR", "category": "hris"},
+  {"id": "bamboo_list_employees", "connector": "bamboohr", "label": "List Employees", "description": "List all employees in BambooHR", "category": "hris"},
+  {"id": "bamboo_create_employee", "connector": "bamboohr", "label": "Create Employee", "description": "Create a new employee record in BambooHR", "category": "hris"},
+  {"id": "workday_get_worker", "connector": "workday", "label": "Get Worker", "description": "Get worker information from Workday", "category": "hris"},
+  {"id": "workday_update_worker", "connector": "workday", "label": "Update Worker", "description": "Update worker details in Workday", "category": "hris"},
+
+  {"id": "greenhouse_list_candidates", "connector": "greenhouse", "label": "List Candidates", "description": "List all candidates in Greenhouse", "category": "ats"},
+  {"id": "greenhouse_create_candidate", "connector": "greenhouse", "label": "Create Candidate", "description": "Create a new candidate application in Greenhouse", "category": "ats"},
+  {"id": "greenhouse_get_application", "connector": "greenhouse", "label": "Get Application", "description": "Get application details from Greenhouse", "category": "ats"},
+  {"id": "lever_list_opportunities", "connector": "lever", "label": "List Opportunities", "description": "List open job opportunities in Lever", "category": "ats"},
+  {"id": "lever_create_candidate", "connector": "lever", "label": "Create Lever Candidate", "description": "Add a new candidate to Lever", "category": "ats"},
+
+  {"id": "salesforce_get_contact", "connector": "salesforce", "label": "Get Contact", "description": "Get a contact record from Salesforce", "category": "crm"},
+  {"id": "salesforce_list_accounts", "connector": "salesforce", "label": "List Accounts", "description": "List all accounts in Salesforce", "category": "crm"},
+  {"id": "salesforce_create_lead", "connector": "salesforce", "label": "Create Lead", "description": "Create a new sales lead in Salesforce", "category": "crm"},
+  {"id": "hubspot_get_contact", "connector": "hubspot", "label": "Get HubSpot Contact", "description": "Get contact details from HubSpot", "category": "crm"},
+  {"id": "hubspot_create_deal", "connector": "hubspot", "label": "Create Deal", "description": "Create a new deal in HubSpot", "category": "crm"},
+
+  {"id": "gcal_create_event", "connector": "google_calendar", "label": "Create Calendar Event", "description": "Create a calendar event in Google Calendar", "category": "calendar"},
+  {"id": "gcal_list_events", "connector": "google_calendar", "label": "List Calendar Events", "description": "List upcoming events from Google Calendar", "category": "calendar"},
+  {"id": "outlook_create_event", "connector": "outlook", "label": "Create Outlook Event", "description": "Create an event in Outlook Calendar", "category": "calendar"},
+  {"id": "outlook_get_schedule", "connector": "outlook", "label": "Get Schedule", "description": "Get free/busy schedule from Outlook", "category": "calendar"},
+
+  {"id": "gdrive_upload_file", "connector": "google_drive", "label": "Upload to Drive", "description": "Upload a file to Google Drive", "category": "storage"},
+  {"id": "gdrive_list_files", "connector": "google_drive", "label": "List Drive Files", "description": "List files in a Google Drive folder", "category": "storage"},
+  {"id": "dropbox_upload_file", "connector": "dropbox", "label": "Upload to Dropbox", "description": "Upload a file to Dropbox", "category": "storage"},
+  {"id": "dropbox_share_file", "connector": "dropbox", "label": "Share Dropbox File", "description": "Share a file link from Dropbox", "category": "storage"},
+
+  {"id": "jira_create_issue", "connector": "jira", "label": "Create Jira Issue", "description": "Create an issue in Jira", "category": "project"},
+  {"id": "jira_list_issues", "connector": "jira", "label": "List Jira Issues", "description": "List issues from a Jira project", "category": "project"},
+  {"id": "asana_create_task", "connector": "asana", "label": "Create Asana Task", "description": "Create a task in Asana", "category": "project"}
+]
