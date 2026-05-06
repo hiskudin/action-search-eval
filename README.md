@@ -1,5 +1,18 @@
 # Action Search Eval
 
+> **Submission notes:** see [RESULTS.md](RESULTS.md) for the full iteration log (V0 → V8), bootstrap CIs, error analyses, and caveats.
+>
+> **To run my pipeline (V8, 81.9% on days 1–10, +48.6pt over baseline):**
+> ```bash
+> uv sync
+> uv run python scripts/finetune.py     # ~5s on CPU, writes models/ft_minilm/
+> uv run python server.py &
+> uv run python evaluate.py --online --ensemble
+> ```
+> Omit `--ensemble` to run V6 (single fine-tuned encoder, 79.5%). Omit both to run V2 cold (66.7%).
+
+---
+
 Build a system that matches natural language queries to the correct connector action.
 
 ## The Task

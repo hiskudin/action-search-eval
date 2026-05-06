@@ -12,3 +12,6 @@ venv/
 model_cache/
 .DS_Store
 _internal/
+models/ft_minilm/
+checkpoints/
+.pytest_cache/

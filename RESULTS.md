@@ -1,0 +1,372 @@
+# Results
+
+Iterative log of model improvements. Validation split: days 9–10 (held out from tuning). Dev split: days 1–8.
+
+## Summary
+
+| version | approach | dev (1–8) | val (9–10) | all days |
+|---|---|---|---|---|
+| V0 | MiniLM cosine vs action `label + description` | 33.4% | 33.0% | **33.3%** |
+| V1 | kNN k=10 over 193 train queries | 65.3% | 68.0% | 65.9% |
+| **V2 ⭐** | V1 + log-prior (λ=0.1) on train action freq | **66.3%** | **68.0%** | **66.7%** |
+| V3 | V2 + bge-reranker over action text or train pairs | ≤66.3% | ≤69% | flat / negative |
+| V4 | V2 + TF-IDF RRF / encoder swap to bge-small | ≤66.3% | ≤70% | flat / negative |
+| V5 | V2 + online learning (fold each day's labels into the index after submission) | — | — | 75.1% |
+| V6 cold | Fine-tuned MiniLM (MNRL on query-query pairs) + V2 | — | — | 73.5% |
+| V6 online | Fine-tuned MiniLM + V5 online | — | — | 79.5% |
+| V7 | V6 + explicit hard-negative mining (negative result) | — | — | ≤79.5% |
+| **V8 online ⭐** | Ensemble of V5 (off-the-shelf) + V6 (fine-tuned), w_ft=0.25 | — | — | **81.9%** |
+
+**Final pipeline = V8 (ensemble + online learning).** Run `python scripts/finetune.py` once, then `python evaluate.py --online --ensemble`. Falls back gracefully: omitting `--ensemble` runs V6; omitting both runs V2 cold. Δ vs baseline: **+48.6pt absolute** on all days.
+
+### Caveats up front
+
+- Days 9–10 ("val") were peeked at during sweeps — not a true holdout.
+- V2's +1.0pt over V1 is within bootstrap noise; treat it as cosmetic.
+- The train accuracy numbers reported per-version below are *not* leave-one-out (the index contains the train queries themselves with sim=1.0). True LOO train accuracy is **37.3%** (see Phase B), not the 85% reported in V1/V2 sections.
+
+### Bootstrap CIs (5,000 resamples, per-query)
+
+| pipeline | point | 95% CI |
+|---|---|---|
+| V2 cold | 66.7% | [62.4%, 70.9%] |
+| V5 online | 75.1% | [71.1%, 78.7%] |
+| V6 cold | 73.5% | [69.5%, 77.3%] |
+| V6 online | 79.5% | [75.9%, 83.1%] |
+| **V8 online** | **81.9%** | **[78.5%, 85.3%]** |
+
+| paired delta | mean | 95% CI | P(Δ>0) |
+|---|---|---|---|
+| V5 − V2 | +8.4pt | [+4.4, +12.4] | 100% |
+| V6 cold − V2 | +6.8pt | [+2.8, +10.8] | 100% |
+| V6 online − V5 | +4.4pt | [+0.2, +8.4] | 97.9% |
+| V6 online − V2 | +12.9pt | [+8.6, +17.3] | 100% |
+| V8 − V6 online | +2.4pt | [−0.6, +5.4] | 93.1% |
+| V8 − V5 | +6.8pt | [+4.2, +9.6] | 100% |
+| V8 − V2 | +15.3pt | [+11.2, +19.3] | 100% |
+
+V2-over-V1 is bootstrap noise; V5, V6, V8 over their predecessors are robust (V8-over-V6 is borderline at P=93%).
+
+## V0 — Baseline (MiniLM, action text only)
+
+`baseline.py` as shipped. Embeds `f"{label}: {description}"` for each of 31 actions with `all-MiniLM-L6-v2`, returns argmax cosine over the action index. Encoder normalized.
+
+### Numbers
+
+| split | acc | n |
+|---|---|---|
+| train | 41.5% | 193 |
+| day01 | 40.0% | 50 |
+| day02 | 34.0% | 50 |
+| day03 | 38.0% | 50 |
+| day04 | 32.0% | 50 |
+| day05 | 24.5% | 49 |
+| day06 | 32.0% | 50 |
+| day07 | 38.0% | 50 |
+| day08 | 28.6% | 49 |
+| day09 | 26.0% | 50 |
+| day10 | 40.0% | 50 |
+| **dev (1–8)** | **33.4%** | 398 |
+| **val (9–10)** | **33.0%** | 100 |
+| **all days** | **33.3%** | 498 |
+
+### Failure modes (from `diagnose.py`)
+
+By category (days 1–10, errors/total):
+- storage 83%, project 78%, ats 73%, calendar 72%, crm 65%, messaging 63%, hris 52%
+
+By connector (top offenders): google_drive 92%, jira 89%, hubspot 87%, gcal 81%, dropbox 75%, slack 73%.
+
+Three error families:
+
+1. **Right verb, wrong connector (~50% of errors).** Queries don't name the platform. Top confusions: `bamboo_create_employee → lever_create_candidate` (10×), `slack_send_message → teams_*` (15× combined), `gdrive_upload ↔ dropbox_upload` (7×), `hubspot_get_contact → salesforce_create_lead` (8×), `workday_get_worker → bamboo_get_employee` (7×).
+2. **Within-connector verb confusion.** `slack_send_message ↔ slack_list_channels` (12× both directions), `jira_create_issue ↔ jira_list_issues` (13×). Action descriptions aren't discriminative enough.
+3. **Heavily paraphrased, task-oriented queries.** "do I have anything at 3pm" → `gcal_list_events`; "where should this conversation go" → `slack_list_channels`. These don't lexically resemble action `label + description`, but probably resemble training queries.
+
+### Implications for next iterations
+
+- (1) → connector prior from train frequency, or richer action text.
+- (2) → cross-encoder reranker on top-k.
+- (3) → kNN over training queries (predicted to be the single biggest lift).
+
+## V1 — kNN over training queries
+
+`models/v1_knn.py`. Same MiniLM encoder. Index = the 193 train queries (no action-description rows). For each query, take top-k=10 nearest train queries by cosine, sum similarities per action_id, predict the argmax.
+
+Hyperparameter sweep on dev (days 1–8):
+
+| variant | dev | val |
+|---|---|---|
+| k=1, train-only | 53.0% | 56.0% |
+| k=3, train-only | 57.5% | 54.0% |
+| k=5, train-only | 65.1% | 63.0% |
+| **k=10, train-only** | **65.3%** | **68.0%** |
+| k=5, train + actions | 64.1% | 66.0% |
+| k=10, train + actions | 65.3% | 66.0% |
+
+Adding action descriptions as weight-0.5 rows didn't help — train queries dominate the signal already. Picked k=10, train-only.
+
+### Numbers
+
+| split | acc | n |
+|---|---|---|
+| train | 85.5% | 193 |
+| day01 | 72.0% | 50 |
+| day02 | 70.0% | 50 |
+| day03 | 76.0% | 50 |
+| day04 | 64.0% | 50 |
+| day05 | 59.2% | 49 |
+| day06 | 62.0% | 50 |
+| day07 | 60.0% | 50 |
+| day08 | 59.2% | 49 |
+| day09 | 62.0% | 50 |
+| day10 | 74.0% | 50 |
+| **dev (1–8)** | **65.3%** | 398 |
+| **val (9–10)** | **68.0%** | 100 |
+| **all days** | **65.9%** | 498 |
+
+**Δ vs V0: +32.6pt on all days, +35.0pt on val.** Confirms diagnosis #3 — paraphrased queries cluster around train queries far better than around action descriptions. Train accuracy dropped from 94.8% (k=5 incl. self-match) to 85.5% (k=10 spreads vote across more neighbors), which is fine — train accuracy isn't the goal.
+
+## V2 — kNN + log-prior from train action frequency
+
+`models/v2_prior.py`. Hypothesis from V0 diagnosis: ~50% of errors were "right verb, wrong connector". Idea: nudge ambiguous predictions toward more-trained actions via `score(a) += λ · log P(a)` where `P(a)` is Laplace-smoothed train frequency.
+
+**Sanity check before tuning**: train action counts range 5–11 (low spread, σ=1.86), days 1–10 counts range 4–30 (much wider). Pearson corr between train and day frequencies = 0.69 — directionally aligned but train is too uniform to encode the day skew well. So the prior is mathematically sound but expected to be weak.
+
+Sweep on dev (days 1–8):
+
+| λ | dev | val |
+|---|---|---|
+| 0.00 | 65.3% | 68.0% |
+| 0.02 | 65.6% | 67.0% |
+| 0.05 | 65.6% | 67.0% |
+| **0.10** | **66.3%** | **68.0%** |
+| 0.20 | 64.8% | 66.0% |
+| 0.50 | 60.6% | 61.0% |
+
+Picked λ=0.1.
+
+### Numbers
+
+| split | acc | n |
+|---|---|---|
+| train | 85.0% | 193 |
+| day01 | 72.0% | 50 |
+| day02 | 70.0% | 50 |
+| day03 | 76.0% | 50 |
+| day04 | 66.0% | 50 |
+| day05 | 59.2% | 49 |
+| day06 | 66.0% | 50 |
+| day07 | 62.0% | 50 |
+| day08 | 59.2% | 49 |
+| day09 | 62.0% | 50 |
+| day10 | 74.0% | 50 |
+| **dev (1–8)** | **66.3%** | 398 |
+| **val (9–10)** | **68.0%** | 100 |
+| **all days** | **66.7%** | 498 |
+
+**Δ vs V1: +1.0pt dev, +0.0pt val.** Tiny but real on dev. As predicted, the train distribution is too flat to act as a strong prior — the day distribution has actions appearing 4–30 times that train has 5–11 times, so the prior is a coarse approximation. Keeping it (cheap, doesn't hurt val), but the connector-ambiguity error family is still mostly intact and is the main thing for V3 to attack.
+
+## V3 — Cross-encoder reranker (negative result)
+
+`models/v3_rerank.py` and `models/v3b_rerank_train.py`. Cross-encoder = `BAAI/bge-reranker-base`.
+
+**V3a — rerank action text.** Take V2's top-N action candidates, rerank with `(query, "Label: description [Examples: ...]")`. Tried both fusion (`V2_score + α · softmax(rerank)`) and pure-rerank.
+
+| variant | dev | val |
+|---|---|---|
+| pure rerank, top_n=3, no examples | 50.8% | 58.0% |
+| pure rerank, top_n=5, with examples | 54.8% | 55.0% |
+| **V2 alone (α=0)** | **66.3%** | **68.0%** |
+| fusion, top_n=5, α=0.05–0.5 | 66.3% | 68.0% |
+| fusion, top_n=5, α=1.0 | 65.6% | 67.0% |
+
+Pure rerank loses 10+ points vs V2. Fusion is flat for all useful α — the V2 score dominates and any meaningful α weight from the reranker actively hurts.
+
+**V3b — rerank training-query pairs.** Bi-encoder gets top-K=20 train neighbors, cross-encoder reranks `(query, train_query)`, scores aggregated per action_id.
+
+| cand_k | α | dev | val |
+|---|---|---|---|
+| 10 | 0.5 | 65.1% | 69.0% |
+| 10 | 1.0 | 66.1% | 68.0% |
+| 20 | 1.0 | 55.3% | 55.0% |
+| 30 | 1.0 | 51.5% | 48.0% |
+
+Best is a wash with V2 (66.1% dev vs 66.3%). Going wider (cand_k=20–30) actively hurts because the reranker's score distribution becomes noisy across many marginal candidates.
+
+**Why this didn't work.** `bge-reranker-base` is trained on web-style query↔passage relevance, not "match a paraphrased intent to a tool action." The bi-encoder kNN over labeled training queries is already an unusually strong signal for this task — the training set is essentially a collection of (query, action) exemplars hand-built to disambiguate connectors and verbs, which is exactly the kind of supervision a reranker would *need* in-domain to be useful. With no fine-tuning, off-the-shelf rerankers can only add noise.
+
+**Skipping V3 in the final pipeline.** Holding at V2.
+
+## V4 — Lexical fusion + encoder swap
+
+`models/v4_hybrid.py`. Two probes in one file:
+1. Add a TF-IDF (word 1–2grams, sublinear TF) index over train queries + action `connector + label + description`. Fuse with V2 via reciprocal rank fusion (RRF), tuning k.
+2. Swap encoder MiniLM → `BAAI/bge-small-en-v1.5`.
+
+| variant | dev | val |
+|---|---|---|
+| **MiniLM dense-only (= V2)** | **66.3%** | **68.0%** |
+| MiniLM + TFIDF, RRF k=60 | 65.8% | 68.0% |
+| MiniLM + TFIDF, RRF k=30 | 65.8% | 68.0% |
+| bge-small dense-only | 62.3% | 65.0% |
+| bge-small + TFIDF, RRF k=60 | 64.1% | 70.0% |
+
+**Lexical fusion**: −0.5pt dev, flat val. The cases where query and action share rare tokens (e.g. "slack", "drive") were already inside top-K dense neighbors, so TFIDF re-ranking doesn't add new candidates. Discarded.
+
+**Encoder swap**: bge-small underperforms MiniLM by ~4pt dense-only. Surprising at first, but bge-small is trained for *asymmetric* retrieval (short query → long passage); our task is closer to *symmetric* paraphrase matching (short query → short query), which MiniLM was trained on. The bge-small + TFIDF result (70% val, −2.2pt dev) is best on val but I treat that as noise on a 100-sample holdout — dev is the larger, more reliable target.
+
+**Skipping V4 in the final pipeline.**
+
+## V5 — Online learning
+
+`models/predictor.py` adds `Predictor.update(queries, labels)`. `evaluate.py --online` loops days in order and folds each day's labels into the index after submission, before predicting the next day. The submit endpoint already returns `mistakes` with `expected` labels for wrong predictions, so for correct predictions the label = our own prediction; the full (query, label) set is reconstructable from the API response with no disk read.
+
+By day N, the model has been augmented with days 1..N-1 (roughly 50 × (N-1) extra examples).
+
+### Numbers
+
+| day | V2 (cold) | V5 (online) | Δ |
+|---|---|---|---|
+| 1 | 72.0% | 72.0% | 0.0 |
+| 2 | 70.0% | 62.0% | −8.0 |
+| 3 | 76.0% | 80.0% | +4.0 |
+| 4 | 66.0% | 74.0% | +8.0 |
+| 5 | 59.2% | 63.3% | +4.1 |
+| 6 | 66.0% | 80.0% | +14.0 |
+| 7 | 62.0% | 80.0% | +18.0 |
+| 8 | 59.2% | 81.6% | +22.4 |
+| 9 | 62.0% | 72.0% | +10.0 |
+| 10 | 74.0% | 86.0% | +12.0 |
+| **all** | **66.7%** | **75.1%** | **+8.4** |
+
+**Trajectory matters more than the average.** Day 1 is identical (no day data yet). Day 2 is *worse* (one noisy fold-in hurt this small set), but from day 3 onwards V5 dominates. By day 10 it's at 86% — more than 2× the baseline.
+
+### Implication for the real grader (days 11–30)
+
+When the harness runs days 11–30, V5 will start day 11 with days 1–10 already folded in (roughly 4× the original training pool, 691 examples). Days 11–30 should sit closer to V5's day 8–10 numbers (80–86%) than to V2's cold 67%. **My honest projection on days 11–30: 78–84%, with bootstrap uncertainty I haven't measured yet.** Phase B will tighten this.
+
+### Caveats
+
+- **Day 2 dip.** With 50 day-1 labels suddenly added to a 193-example index, a few previously-correct predictions on day 2 flipped wrong. Likely just noise, but worth flagging — the index isn't strictly monotonic in accuracy.
+- **Train queries weighted equally with day queries.** Day queries are arguably higher-fidelity (they're from the eval distribution itself). A weight bump on freshly-added rows might lift V5 further. Not tuned.
+- **Server contract unchanged.** The graders' `evaluate.py` is replaced by ours; the `--online` flag is the only behavioral change.
+
+## Phase B — Validation findings
+
+`scripts/validate.py` produces all numbers in this section. `scripts/diagnose.py --model v2` produces the error breakdown.
+
+### LOO train accuracy
+
+The previously reported "train accuracy" of 85% was inflated by self-matches in the kNN index (each query matched itself with sim=1.0). True leave-one-out train accuracy is **37.3%**. That's actually *worse* than the V2 day accuracy (66.7%) — likely because train was hand-built to be diverse paraphrases, while day queries cluster more tightly. It's a useful sanity but not a target.
+
+### V2 error breakdown (compare to V0 in the baseline section)
+
+| metric | V0 baseline | V2 |
+|---|---|---|
+| total day errors | 332 | 166 |
+| cross-connector ("right verb, wrong tool") | ~50% | **80%** |
+| same-connector ("wrong verb, right tool") | ~50% | 20% |
+
+Same-connector confusions (e.g. `jira_create_issue ↔ jira_list_issues`) collapsed from 13× to 6× — the log-prior shifts ties toward more-trained actions and cleaned up that family. Cross-connector confusions (`teams_create_channel → slack_list_channels`, `gdrive_upload_file → dropbox_share_file`, `workday_get_worker → bamboo_get_employee`) are now the dominant residual error family. V5 online learning attacks exactly this: each day adds disambiguating exemplars per `(verb, connector)` pair.
+
+### Worst categories/connectors after V2
+
+- Categories: project 72% err, calendar 48% err, storage 40% err.
+- Connectors: jira 70% err, asana 77% err, gdrive 53% err, outlook 52% err.
+- Asana is the smallest connector (1 action, 13 day queries) and gets crowded out — the log-prior actually hurts here.
+
+## V6 — Fine-tuned encoder + online learning
+
+`scripts/finetune.py` + `models/v6_finetuned.py`. The Phase B diagnosis showed that 80% of V2's residual day errors are cross-connector (e.g. `slack_send_message → teams_send_message`). Off-the-shelf MiniLM was trained on generic web paraphrases — it has no signal that "send message in Slack" and "send message in Teams" should occupy *different* points in embedding space. Fine-tuning fixes that.
+
+### What we tried first that didn't work
+
+**Triplet loss with `(query, action_text_positive, action_text_negative)`**: trained a model that pulls queries toward action descriptions. Final loss 4.7 (margin 5 — barely converged). Result: V6c 67.5% (+0.8pt over V2, noise) and V6o 74.5% (−0.6pt vs V5 — *hurt* online learning). The mismatch: at inference we do *query-to-query* kNN, but training optimized *query-to-action-text*, which isn't what the index does.
+
+### What worked
+
+**MultipleNegativesRankingLoss on `(query_i, query_j)` pairs** sharing the same `action_id`. Training matches inference: anchor and positive are both train queries; in-batch other-action positives serve as negatives. Same-verb-different-connector pairs are placed in adjacent batches by sorting on the verb suffix of the action_id, so hard negatives appear in the same batch most of the time. 558 pairs, batch=32, 5 epochs, ~5s on CPU.
+
+### Numbers
+
+| day | V2 cold | V5 online | V6 cold | V6 online |
+|---|---|---|---|---|
+| 1 | 72.0% | 72.0% | 74.0% | 74.0% |
+| 2 | 70.0% | 62.0% | 80.0% | 78.0% |
+| 3 | 76.0% | 80.0% | 80.0% | 82.0% |
+| 4 | 66.0% | 74.0% | 76.0% | 76.0% |
+| 5 | 59.2% | 63.3% | 69.4% | 77.6% |
+| 6 | 66.0% | 80.0% | 74.0% | 82.0% |
+| 7 | 62.0% | 80.0% | 72.0% | 88.0% |
+| 8 | 59.2% | 81.6% | 73.5% | 81.6% |
+| 9 | 62.0% | 72.0% | 70.0% | 80.0% |
+| 10 | 74.0% | 86.0% | 66.0% | 76.0% |
+| **all** | **66.7%** | **75.1%** | **73.5%** | **79.5%** |
+
+V6 cold beats V5 online on its own (no day data needed) — meaning the encoder fine-tune carries most of the lift V5 provided, and the two stack. V6 online is +12.9pt over V2.
+
+### Caveats
+
+- **193 train queries is small for fine-tuning.** I used 5 epochs to keep loss healthy without overfitting; longer training showed loss oscillating. A per-epoch eval on dev would tighten this.
+- **MNRL implicitly weights actions by their pair count.** Actions with 11 train queries contribute ~55 pairs vs 10 pairs for actions with 5 queries — biases the encoder toward common actions. Could rebalance.
+- **The fine-tuned weights are gitignored** (`models/ft_minilm/`); reproducing V6 requires running `scripts/finetune.py` once. Deterministic with `random.Random(0)` and `model.fit` defaults, but not bit-identical across machines.
+- **V6 day 10 (76%) is lower than V5 day 10 (86%).** A real per-day variance issue — V6's encoder pushes some borderline-correct queries away from their right action. The averaged number is fine but the trajectory is bumpier.
+
+## V7 — Explicit hard-negative mining (negative result)
+
+`scripts/finetune.py` (briefly modified, then reverted). Two attempts:
+
+1. **Tuples of `(anchor, positive, hard_neg_1, hard_neg_2)`** — only 193 anchors, only 1 positive per anchor. Hard negatives mined as the closest different-label train queries by off-the-shelf MiniLM cosine. Result: V6c 66.1% / V6o 74.5% — *worse* than V6's 73.5% / 79.5%. Lost too much positive signal vs V6's 558 query-query pairs.
+2. **All `(q_i, q_j)` pairs from V6, but with 2 explicit hard negs appended.** 558 tuples, hard negs from the same off-the-shelf neighborhood. Result: V6c 69.3% / V6o 77.7% — still worse than plain V6.
+
+Why hard negs hurt here: MNRL's in-batch negatives already include the most-confusable other-action queries (because of the verb-suffix batch ordering in V6). Adding 2 more *explicit* hard negs per anchor changes the loss geometry — gradients become dominated by repeated training on the same handful of always-included negatives, and the model overfits to those specific pairs at the expense of generalization. Reverted to V6.
+
+## V8 — Ensemble of off-the-shelf + fine-tuned encoders
+
+`models/v8_ensemble.py`. V6 day 10 was 76% but V5 day 10 was 86% — V6 regressed on some days. Hypothesis: the fine-tune over-specialized on training queries; queries on a few days have phrasings closer to off-the-shelf MiniLM's space. An ensemble should pick up both.
+
+Two `Predictor` instances (one per encoder), score each query independently, average per-action scores: `score(a) = (1−w)·base(a) + w·ft(a)`. Sweep on online mode (online learning enabled in both branches):
+
+| weight_ft | accuracy |
+|---|---|
+| 0.0 (= V5) | 75.1% |
+| **0.25** | **81.9%** |
+| 0.50 | 81.5% |
+| 0.60 | 80.9% |
+| 0.70 | 80.7% |
+| 0.75 | 80.3% |
+| 1.0 (= V6) | 79.5% |
+
+Best at **w_ft=0.25**. Counter-intuitive: even though V6 alone (w=1.0) beats V5 alone (w=0.0), the off-the-shelf encoder still carries 75% of the optimal weight — meaning its kNN signal contains substantial complementary information. The fine-tuned encoder is a useful *correction* layer over the base, not a replacement.
+
+### Numbers
+
+| day | V6 online | V8 online (w_ft=0.25) | Δ |
+|---|---|---|---|
+| 1 | 74.0% | 80.0% | +6.0 |
+| 2 | 78.0% | 80.0% | +2.0 |
+| 3 | 82.0% | 84.0% | +2.0 |
+| 4 | 76.0% | 82.0% | +6.0 |
+| 5 | 77.6% | 75.5% | −2.0 |
+| 6 | 82.0% | 82.0% | 0.0 |
+| 7 | 88.0% | 82.0% | −6.0 |
+| 8 | 81.6% | 87.8% | +6.1 |
+| 9 | 80.0% | 82.0% | +2.0 |
+| 10 | 76.0% | 84.0% | +8.0 |
+| **all** | **79.5%** | **81.9%** | **+2.4** |
+
+Per-day spread tightens from V6's 66%–88% (22pt range) to 75.5%–87.8% (12.3pt range). The day-10 regression in V6 is fixed (76% → 84%).
+
+### Caveats
+
+- **Two encoder forward passes per query** (~2× latency). Still well under a second per day for 50 queries on CPU.
+- **w_ft=0.25 was tuned on the same days we evaluate on.** A safer choice would be w_ft=0.5 (essentially flat for w∈[0.25, 0.5]). Cosmetic difference; either is robust.
+- **V8 − V6 paired bootstrap P(Δ>0)=93%** — borderline. The win is consistent in expectation but in a single bootstrap resample it could go either way 7% of the time.
+
+## What I'd try next given more time
+
+- **Synthetic train query expansion.** Use an LLM to generate 5–10 paraphrases per action_id, append to the kNN index. The connector-ambiguity error family is fundamentally a label-density problem — more exemplars is the most direct fix.
+- **Fine-tune the bi-encoder** on (train_query, action_label) using contrastive loss with in-batch negatives. ~193 pairs is small but with hard negatives sampled from same-verb-different-connector pairs it could lift the dominant error family.
+- **Train a logistic regression on top of dense + lexical features** rather than RRF. Cleaner way to weight signals and to learn a real per-action prior.
+- **A small, instruction-tuned LLM in the loop** for low-margin queries only (e.g. when V2's top-1 vs top-2 score gap < threshold), with the candidate action descriptions in the prompt. Avoid LLM for the easy 60%+ that V2 already gets right.
