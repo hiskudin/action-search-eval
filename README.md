@@ -11,7 +11,7 @@ You are given:
 
 Your job: build a model pipeline that takes a natural language query (e.g. *"send a message to the team channel"*) and returns the correct `action_id` (e.g. `slack_send_message`).
 
-We are going to run your pipeline on a simulated month but we are only giving you access to the first ten days for training. We will use your version of the `evaluate.py` script, feel free to make any modification to `main` for your work but the days.jsonl will be the same and we want this to be evaluated iteratively to simulate a real-world environment
+We are going to run your pipeline on a simulated month but we are only giving you access to the first ten days for training. We will use your version of the `evaluate.py` script, feel free to make any modification to `main` for your work but the days.jsonl will be the same and we want this to be **evaluated iteratively** to simulate a real-world environment.
 
 ## Setup
 
