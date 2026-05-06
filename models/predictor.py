@@ -18,11 +18,19 @@ import numpy as np
 from sentence_transformers import SentenceTransformer
 
 DATA_DIR = Path(__file__).resolve().parent.parent / "data"
+FT_PATH = Path(__file__).resolve().parent / "ft_minilm"
+
+
+def _default_encoder() -> str:
+    """Use the fine-tuned MiniLM if `scripts/finetune.py` has been run; else off-the-shelf."""
+    if FT_PATH.exists() and (FT_PATH / "config.json").exists():
+        return str(FT_PATH)
+    return "sentence-transformers/all-MiniLM-L6-v2"
 
 
 @dataclass(frozen=True)
 class Config:
-    encoder: str = "sentence-transformers/all-MiniLM-L6-v2"
+    encoder: str = ""  # populated from _default_encoder() if empty
     k: int = 10
     prior_lambda: float = 0.1
     smoothing: float = 1.0
@@ -33,6 +41,9 @@ CONFIG = Config()
 
 class Predictor:
     def __init__(self, config: Config = CONFIG):
+        if not config.encoder:
+            config = Config(encoder=_default_encoder(), k=config.k,
+                            prior_lambda=config.prior_lambda, smoothing=config.smoothing)
         self.config = config
         with open(DATA_DIR / "actions.json") as f:
             actions = json.load(f)

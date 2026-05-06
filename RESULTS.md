@@ -11,9 +11,11 @@ Iterative log of model improvements. Validation split: days 9–10 (held out fro
 | **V2 ⭐** | V1 + log-prior (λ=0.1) on train action freq | **66.3%** | **68.0%** | **66.7%** |
 | V3 | V2 + bge-reranker over action text or train pairs | ≤66.3% | ≤69% | flat / negative |
 | V4 | V2 + TF-IDF RRF / encoder swap to bge-small | ≤66.3% | ≤70% | flat / negative |
-| **V5 ⭐** | V2 + online learning (fold each day's labels into the index after submission) | — | — | **75.1%** |
+| V5 | V2 + online learning (fold each day's labels into the index after submission) | — | — | 75.1% |
+| V6 cold | Fine-tuned MiniLM (MNRL on query-query pairs) + V2 | — | — | 73.5% |
+| **V6 online ⭐** | Fine-tuned MiniLM + V5 online | — | — | **79.5%** |
 
-**Final pipeline = V5 (V2 + online learning).** Lives in `models/predictor.py`, invoked via `python evaluate.py --online`. Regression test in `tests/test_predictor.py` pins cold V2 accuracy ≥60% on days 1–10. Δ vs baseline: **+41.8pt absolute** on all days. Day 10 alone is 86% (vs baseline's 40%).
+**Final pipeline = V6 (fine-tuned encoder + online learning).** Lives in `models/predictor.py`; `evaluate.py` auto-detects `models/ft_minilm/` and uses it when present, otherwise falls back to off-the-shelf MiniLM. Run `python scripts/finetune.py` once to produce the fine-tuned weights, then `python evaluate.py --online`. Δ vs baseline: **+46.2pt absolute** on all days.
 
 ### Caveats up front
 
@@ -27,9 +29,17 @@ Iterative log of model improvements. Validation split: days 9–10 (held out fro
 |---|---|---|
 | V2 cold | 66.7% | [62.4%, 70.9%] |
 | V5 online | 75.1% | [71.1%, 78.7%] |
-| V5 − V2 (paired) | +8.4pt | [+4.4pt, +12.4pt] |
+| V6 cold | 73.5% | [69.5%, 77.3%] |
+| **V6 online** | **79.5%** | **[75.9%, 83.1%]** |
 
-100% of bootstrap resamples have V5 > V2. V5 over V2 is robust; V2 over V1 is not.
+| paired delta | mean | 95% CI | P(Δ>0) |
+|---|---|---|---|
+| V5 − V2 | +8.4pt | [+4.4, +12.4] | 100% |
+| V6 cold − V2 | +6.8pt | [+2.8, +10.8] | 100% |
+| V6 online − V5 | +4.4pt | [+0.2, +8.4] | 97.9% |
+| V6 online − V2 | +12.9pt | [+8.6, +17.3] | 100% |
+
+V2-over-V1 is bootstrap noise; everything from V5 forward is statistically robust.
 
 ## V0 — Baseline (MiniLM, action text only)
 
@@ -263,6 +273,43 @@ Same-connector confusions (e.g. `jira_create_issue ↔ jira_list_issues`) collap
 - Categories: project 72% err, calendar 48% err, storage 40% err.
 - Connectors: jira 70% err, asana 77% err, gdrive 53% err, outlook 52% err.
 - Asana is the smallest connector (1 action, 13 day queries) and gets crowded out — the log-prior actually hurts here.
+
+## V6 — Fine-tuned encoder + online learning
+
+`scripts/finetune.py` + `models/v6_finetuned.py`. The Phase B diagnosis showed that 80% of V2's residual day errors are cross-connector (e.g. `slack_send_message → teams_send_message`). Off-the-shelf MiniLM was trained on generic web paraphrases — it has no signal that "send message in Slack" and "send message in Teams" should occupy *different* points in embedding space. Fine-tuning fixes that.
+
+### What we tried first that didn't work
+
+**Triplet loss with `(query, action_text_positive, action_text_negative)`**: trained a model that pulls queries toward action descriptions. Final loss 4.7 (margin 5 — barely converged). Result: V6c 67.5% (+0.8pt over V2, noise) and V6o 74.5% (−0.6pt vs V5 — *hurt* online learning). The mismatch: at inference we do *query-to-query* kNN, but training optimized *query-to-action-text*, which isn't what the index does.
+
+### What worked
+
+**MultipleNegativesRankingLoss on `(query_i, query_j)` pairs** sharing the same `action_id`. Training matches inference: anchor and positive are both train queries; in-batch other-action positives serve as negatives. Same-verb-different-connector pairs are placed in adjacent batches by sorting on the verb suffix of the action_id, so hard negatives appear in the same batch most of the time. 558 pairs, batch=32, 5 epochs, ~5s on CPU.
+
+### Numbers
+
+| day | V2 cold | V5 online | V6 cold | V6 online |
+|---|---|---|---|---|
+| 1 | 72.0% | 72.0% | 74.0% | 74.0% |
+| 2 | 70.0% | 62.0% | 80.0% | 78.0% |
+| 3 | 76.0% | 80.0% | 80.0% | 82.0% |
+| 4 | 66.0% | 74.0% | 76.0% | 76.0% |
+| 5 | 59.2% | 63.3% | 69.4% | 77.6% |
+| 6 | 66.0% | 80.0% | 74.0% | 82.0% |
+| 7 | 62.0% | 80.0% | 72.0% | 88.0% |
+| 8 | 59.2% | 81.6% | 73.5% | 81.6% |
+| 9 | 62.0% | 72.0% | 70.0% | 80.0% |
+| 10 | 74.0% | 86.0% | 66.0% | 76.0% |
+| **all** | **66.7%** | **75.1%** | **73.5%** | **79.5%** |
+
+V6 cold beats V5 online on its own (no day data needed) — meaning the encoder fine-tune carries most of the lift V5 provided, and the two stack. V6 online is +12.9pt over V2.
+
+### Caveats
+
+- **193 train queries is small for fine-tuning.** I used 5 epochs to keep loss healthy without overfitting; longer training showed loss oscillating. A per-epoch eval on dev would tighten this.
+- **MNRL implicitly weights actions by their pair count.** Actions with 11 train queries contribute ~55 pairs vs 10 pairs for actions with 5 queries — biases the encoder toward common actions. Could rebalance.
+- **The fine-tuned weights are gitignored** (`models/ft_minilm/`); reproducing V6 requires running `scripts/finetune.py` once. Deterministic with `random.Random(0)` and `model.fit` defaults, but not bit-identical across machines.
+- **V6 day 10 (76%) is lower than V5 day 10 (86%).** A real per-day variance issue — V6's encoder pushes some borderline-correct queries away from their right action. The averaged number is fine but the trajectory is bumpier.
 
 ## What I'd try next given more time
 

@@ -74,7 +74,27 @@ def v2_cold_outcomes() -> np.ndarray:
 
 
 def v5_online_outcomes() -> np.ndarray:
-    p = Predictor()
+    return _online_outcomes(Predictor())
+
+
+def v6_outcomes(online: bool) -> np.ndarray:
+    from models.predictor import Config
+    ft_path = ROOT / "models" / "ft_minilm"
+    p = Predictor(Config(encoder=str(ft_path)))
+    return _online_outcomes(p) if online else _cold_outcomes(p)
+
+
+def _cold_outcomes(p: Predictor) -> np.ndarray:
+    out = []
+    for d in range(1, 11):
+        samples = load_day(d)
+        preds = p.predict_batch([s["query"] for s in samples])
+        for pred, s in zip(preds, samples):
+            out.append(pred == s["action_id"])
+    return np.array(out, dtype=bool)
+
+
+def _online_outcomes(p: Predictor) -> np.ndarray:
     out = []
     for d in range(1, 11):
         samples = load_day(d)
@@ -82,7 +102,6 @@ def v5_online_outcomes() -> np.ndarray:
         preds = p.predict_batch(queries)
         for pred, s in zip(preds, samples):
             out.append(pred == s["action_id"])
-        # Online update: fold true labels into the index.
         p.update(queries, [s["action_id"] for s in samples])
     return np.array(out, dtype=bool)
 
@@ -110,17 +129,38 @@ def main():
     print(f"    bootstrap mean: {mean5:.1%}")
     print(f"    95% CI : [{lo5:.1%}, {hi5:.1%}]")
 
-    print("\n[4] V5 vs V2 paired delta")
-    diff = v5.astype(int) - v2.astype(int)
-    diffs_boot = []
-    n_obs = len(diff)
-    for _ in range(N_BOOT):
-        idx = RNG.integers(0, n_obs, n_obs)
-        diffs_boot.append(diff[idx].mean())
-    diffs_boot = np.array(diffs_boot)
-    print(f"    mean Δ: {diff.mean():+.1%}")
-    print(f"    95% CI of Δ: [{np.percentile(diffs_boot, 2.5):+.1%}, {np.percentile(diffs_boot, 97.5):+.1%}]")
-    print(f"    fraction of bootstraps with Δ>0: {(diffs_boot > 0).mean():.1%}")
+    def paired_delta(a, b, label):
+        diff = b.astype(int) - a.astype(int)
+        diffs_boot = []
+        n_obs = len(diff)
+        for _ in range(N_BOOT):
+            idx = RNG.integers(0, n_obs, n_obs)
+            diffs_boot.append(diff[idx].mean())
+        diffs_boot = np.array(diffs_boot)
+        print(f"    {label}: mean Δ {diff.mean():+.1%}, 95% CI "
+              f"[{np.percentile(diffs_boot, 2.5):+.1%}, "
+              f"{np.percentile(diffs_boot, 97.5):+.1%}], "
+              f"P(Δ>0)={(diffs_boot > 0).mean():.1%}")
+
+    print("\n[4] Paired deltas")
+    paired_delta(v2, v5, "V5 - V2     ")
+
+    print("\n[5] V6 cold (fine-tuned encoder, no online)")
+    v6c = v6_outcomes(online=False)
+    mean6c, lo6c, hi6c = bootstrap_ci(v6c)
+    print(f"    point  : {v6c.mean():.1%} ({v6c.sum()}/{len(v6c)})")
+    print(f"    95% CI : [{lo6c:.1%}, {hi6c:.1%}]")
+
+    print("\n[6] V6 online (fine-tuned encoder + online learning)")
+    v6o = v6_outcomes(online=True)
+    mean6o, lo6o, hi6o = bootstrap_ci(v6o)
+    print(f"    point  : {v6o.mean():.1%} ({v6o.sum()}/{len(v6o)})")
+    print(f"    95% CI : [{lo6o:.1%}, {hi6o:.1%}]")
+
+    print("\n[7] More paired deltas")
+    paired_delta(v2, v6c, "V6c - V2    ")
+    paired_delta(v5, v6o, "V6o - V5    ")
+    paired_delta(v2, v6o, "V6o - V2    ")
 
 
 if __name__ == "__main__":

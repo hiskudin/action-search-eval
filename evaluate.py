@@ -45,6 +45,7 @@ def main():
     args = parser.parse_args()
 
     predictor = Predictor()
+    print(f"Using encoder: {predictor.config.encoder}")
     days = [args.day] if args.day is not None else list(range(1, 11))
 
     total_correct = 0
