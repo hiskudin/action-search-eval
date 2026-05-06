@@ -2,14 +2,18 @@
 
 > **Submission notes:** see [RESULTS.md](RESULTS.md) for the full iteration log (V0 → V8), bootstrap CIs, error analyses, and caveats.
 >
-> **To run my pipeline (V8, 81.9% on days 1–10, +48.6pt over baseline):**
+> **To run my pipeline:**
 > ```bash
 > uv sync
 > uv run python scripts/finetune.py     # ~5s on CPU, writes models/ft_minilm/
 > uv run python server.py &
-> uv run python evaluate.py --online --ensemble
 > ```
-> Omit `--ensemble` to run V6 (single fine-tuned encoder, 79.5%). Omit both to run V2 cold (66.7%).
+> Then pick a variant:
+> ```bash
+> uv run python evaluate.py --online --ensemble   # V8 ensemble — 81.9% (+48.6pt over baseline)
+> uv run python evaluate.py --online              # V6 fine-tuned only — 79.5%
+> uv run python evaluate.py                        # V2 cold (no finetune, no online) — 66.7%
+> ```
 
 ---
 
