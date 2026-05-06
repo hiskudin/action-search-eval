@@ -218,10 +218,6 @@ Best is a wash with V2 (66.1% dev vs 66.3%). Going wider (cand_k=20–30) active
 
 **Skipping V4 in the final pipeline.**
 
-## Final pipeline
-
-V2 (kNN k=10 over train queries + Laplace-smoothed log-prior, λ=0.1) folded into `evaluate.py`. All days: **66.7%**, val (9–10): **68.0%** — a +33.4pt absolute lift over the baseline's 33.3%.
-
 ## V5 — Online learning
 
 `models/predictor.py` adds `Predictor.update(queries, labels)`. `evaluate.py --online` loops days in order and folds each day's labels into the index after submission, before predicting the next day. The submit endpoint already returns `mistakes` with `expected` labels for wrong predictions, so for correct predictions the label = our own prediction; the full (query, label) set is reconstructable from the API response with no disk read.
