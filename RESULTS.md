@@ -15,12 +15,21 @@ Iterative log of model improvements. Validation split: days 9–10 (held out fro
 
 **Final pipeline = V5 (V2 + online learning).** Lives in `models/predictor.py`, invoked via `python evaluate.py --online`. Regression test in `tests/test_predictor.py` pins cold V2 accuracy ≥60% on days 1–10. Δ vs baseline: **+41.8pt absolute** on all days. Day 10 alone is 86% (vs baseline's 40%).
 
-### Caveats up front (see "Methodology limitations" near the bottom)
+### Caveats up front
 
 - Days 9–10 ("val") were peeked at during sweeps — not a true holdout.
-- Per-day variance is 59%–76%; the 30-day grader could land anywhere in that range.
-- V2's +1.0pt over V1 is within bootstrap noise on 398 dev samples.
-- Train accuracy reported below is *not* leave-one-out; the index contains the train queries themselves.
+- V2's +1.0pt over V1 is within bootstrap noise; treat it as cosmetic.
+- The train accuracy numbers reported per-version below are *not* leave-one-out (the index contains the train queries themselves with sim=1.0). True LOO train accuracy is **37.3%** (see Phase B), not the 85% reported in V1/V2 sections.
+
+### Bootstrap CIs (5,000 resamples, per-query)
+
+| pipeline | point | 95% CI |
+|---|---|---|
+| V2 cold | 66.7% | [62.4%, 70.9%] |
+| V5 online | 75.1% | [71.1%, 78.7%] |
+| V5 − V2 (paired) | +8.4pt | [+4.4pt, +12.4pt] |
+
+100% of bootstrap resamples have V5 > V2. V5 over V2 is robust; V2 over V1 is not.
 
 ## V0 — Baseline (MiniLM, action text only)
 
@@ -230,6 +239,30 @@ When the harness runs days 11–30, V5 will start day 11 with days 1–10 alread
 - **Day 2 dip.** With 50 day-1 labels suddenly added to a 193-example index, a few previously-correct predictions on day 2 flipped wrong. Likely just noise, but worth flagging — the index isn't strictly monotonic in accuracy.
 - **Train queries weighted equally with day queries.** Day queries are arguably higher-fidelity (they're from the eval distribution itself). A weight bump on freshly-added rows might lift V5 further. Not tuned.
 - **Server contract unchanged.** The graders' `evaluate.py` is replaced by ours; the `--online` flag is the only behavioral change.
+
+## Phase B — Validation findings
+
+`scripts/validate.py` produces all numbers in this section. `scripts/diagnose.py --model v2` produces the error breakdown.
+
+### LOO train accuracy
+
+The previously reported "train accuracy" of 85% was inflated by self-matches in the kNN index (each query matched itself with sim=1.0). True leave-one-out train accuracy is **37.3%**. That's actually *worse* than the V2 day accuracy (66.7%) — likely because train was hand-built to be diverse paraphrases, while day queries cluster more tightly. It's a useful sanity but not a target.
+
+### V2 error breakdown (compare to V0 in the baseline section)
+
+| metric | V0 baseline | V2 |
+|---|---|---|
+| total day errors | 332 | 166 |
+| cross-connector ("right verb, wrong tool") | ~50% | **80%** |
+| same-connector ("wrong verb, right tool") | ~50% | 20% |
+
+Same-connector confusions (e.g. `jira_create_issue ↔ jira_list_issues`) collapsed from 13× to 6× — the log-prior shifts ties toward more-trained actions and cleaned up that family. Cross-connector confusions (`teams_create_channel → slack_list_channels`, `gdrive_upload_file → dropbox_share_file`, `workday_get_worker → bamboo_get_employee`) are now the dominant residual error family. V5 online learning attacks exactly this: each day adds disambiguating exemplars per `(verb, connector)` pair.
+
+### Worst categories/connectors after V2
+
+- Categories: project 72% err, calendar 48% err, storage 40% err.
+- Connectors: jira 70% err, asana 77% err, gdrive 53% err, outlook 52% err.
+- Asana is the smallest connector (1 action, 13 day queries) and gets crowded out — the log-prior actually hurts here.
 
 ## What I'd try next given more time
 
