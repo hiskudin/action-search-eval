@@ -73,7 +73,7 @@ uv sync
 ## Guidelines
 
 - The baseline uses `all-MiniLM-L6-v2` but you're free to use anything open-source.
-- You have ~2 hours.
+- You expect this task to not take more than 2 hours. Commit regularly to your fork/repository so we can see the commit history.
 - Feel free to use LLMs but you are responsible for everything in the submission.
 
 Have fun.
