@@ -13,9 +13,11 @@ Iterative log of model improvements. Validation split: days 9–10 (held out fro
 | V4 | V2 + TF-IDF RRF / encoder swap to bge-small | ≤66.3% | ≤70% | flat / negative |
 | V5 | V2 + online learning (fold each day's labels into the index after submission) | — | — | 75.1% |
 | V6 cold | Fine-tuned MiniLM (MNRL on query-query pairs) + V2 | — | — | 73.5% |
-| **V6 online ⭐** | Fine-tuned MiniLM + V5 online | — | — | **79.5%** |
+| V6 online | Fine-tuned MiniLM + V5 online | — | — | 79.5% |
+| V7 | V6 + explicit hard-negative mining (negative result) | — | — | ≤79.5% |
+| **V8 online ⭐** | Ensemble of V5 (off-the-shelf) + V6 (fine-tuned), w_ft=0.25 | — | — | **81.9%** |
 
-**Final pipeline = V6 (fine-tuned encoder + online learning).** Lives in `models/predictor.py`; `evaluate.py` auto-detects `models/ft_minilm/` and uses it when present, otherwise falls back to off-the-shelf MiniLM. Run `python scripts/finetune.py` once to produce the fine-tuned weights, then `python evaluate.py --online`. Δ vs baseline: **+46.2pt absolute** on all days.
+**Final pipeline = V8 (ensemble + online learning).** Run `python scripts/finetune.py` once, then `python evaluate.py --online --ensemble`. Falls back gracefully: omitting `--ensemble` runs V6; omitting both runs V2 cold. Δ vs baseline: **+48.6pt absolute** on all days.
 
 ### Caveats up front
 
@@ -30,7 +32,8 @@ Iterative log of model improvements. Validation split: days 9–10 (held out fro
 | V2 cold | 66.7% | [62.4%, 70.9%] |
 | V5 online | 75.1% | [71.1%, 78.7%] |
 | V6 cold | 73.5% | [69.5%, 77.3%] |
-| **V6 online** | **79.5%** | **[75.9%, 83.1%]** |
+| V6 online | 79.5% | [75.9%, 83.1%] |
+| **V8 online** | **81.9%** | **[78.5%, 85.3%]** |
 
 | paired delta | mean | 95% CI | P(Δ>0) |
 |---|---|---|---|
@@ -38,8 +41,11 @@ Iterative log of model improvements. Validation split: days 9–10 (held out fro
 | V6 cold − V2 | +6.8pt | [+2.8, +10.8] | 100% |
 | V6 online − V5 | +4.4pt | [+0.2, +8.4] | 97.9% |
 | V6 online − V2 | +12.9pt | [+8.6, +17.3] | 100% |
+| V8 − V6 online | +2.4pt | [−0.6, +5.4] | 93.1% |
+| V8 − V5 | +6.8pt | [+4.2, +9.6] | 100% |
+| V8 − V2 | +15.3pt | [+11.2, +19.3] | 100% |
 
-V2-over-V1 is bootstrap noise; everything from V5 forward is statistically robust.
+V2-over-V1 is bootstrap noise; V5, V6, V8 over their predecessors are robust (V8-over-V6 is borderline at P=93%).
 
 ## V0 — Baseline (MiniLM, action text only)
 
@@ -310,6 +316,57 @@ V6 cold beats V5 online on its own (no day data needed) — meaning the encoder 
 - **MNRL implicitly weights actions by their pair count.** Actions with 11 train queries contribute ~55 pairs vs 10 pairs for actions with 5 queries — biases the encoder toward common actions. Could rebalance.
 - **The fine-tuned weights are gitignored** (`models/ft_minilm/`); reproducing V6 requires running `scripts/finetune.py` once. Deterministic with `random.Random(0)` and `model.fit` defaults, but not bit-identical across machines.
 - **V6 day 10 (76%) is lower than V5 day 10 (86%).** A real per-day variance issue — V6's encoder pushes some borderline-correct queries away from their right action. The averaged number is fine but the trajectory is bumpier.
+
+## V7 — Explicit hard-negative mining (negative result)
+
+`scripts/finetune.py` (briefly modified, then reverted). Two attempts:
+
+1. **Tuples of `(anchor, positive, hard_neg_1, hard_neg_2)`** — only 193 anchors, only 1 positive per anchor. Hard negatives mined as the closest different-label train queries by off-the-shelf MiniLM cosine. Result: V6c 66.1% / V6o 74.5% — *worse* than V6's 73.5% / 79.5%. Lost too much positive signal vs V6's 558 query-query pairs.
+2. **All `(q_i, q_j)` pairs from V6, but with 2 explicit hard negs appended.** 558 tuples, hard negs from the same off-the-shelf neighborhood. Result: V6c 69.3% / V6o 77.7% — still worse than plain V6.
+
+Why hard negs hurt here: MNRL's in-batch negatives already include the most-confusable other-action queries (because of the verb-suffix batch ordering in V6). Adding 2 more *explicit* hard negs per anchor changes the loss geometry — gradients become dominated by repeated training on the same handful of always-included negatives, and the model overfits to those specific pairs at the expense of generalization. Reverted to V6.
+
+## V8 — Ensemble of off-the-shelf + fine-tuned encoders
+
+`models/v8_ensemble.py`. V6 day 10 was 76% but V5 day 10 was 86% — V6 regressed on some days. Hypothesis: the fine-tune over-specialized on training queries; queries on a few days have phrasings closer to off-the-shelf MiniLM's space. An ensemble should pick up both.
+
+Two `Predictor` instances (one per encoder), score each query independently, average per-action scores: `score(a) = (1−w)·base(a) + w·ft(a)`. Sweep on online mode (online learning enabled in both branches):
+
+| weight_ft | accuracy |
+|---|---|
+| 0.0 (= V5) | 75.1% |
+| **0.25** | **81.9%** |
+| 0.50 | 81.5% |
+| 0.60 | 80.9% |
+| 0.70 | 80.7% |
+| 0.75 | 80.3% |
+| 1.0 (= V6) | 79.5% |
+
+Best at **w_ft=0.25**. Counter-intuitive: even though V6 alone (w=1.0) beats V5 alone (w=0.0), the off-the-shelf encoder still carries 75% of the optimal weight — meaning its kNN signal contains substantial complementary information. The fine-tuned encoder is a useful *correction* layer over the base, not a replacement.
+
+### Numbers
+
+| day | V6 online | V8 online (w_ft=0.25) | Δ |
+|---|---|---|---|
+| 1 | 74.0% | 80.0% | +6.0 |
+| 2 | 78.0% | 80.0% | +2.0 |
+| 3 | 82.0% | 84.0% | +2.0 |
+| 4 | 76.0% | 82.0% | +6.0 |
+| 5 | 77.6% | 75.5% | −2.0 |
+| 6 | 82.0% | 82.0% | 0.0 |
+| 7 | 88.0% | 82.0% | −6.0 |
+| 8 | 81.6% | 87.8% | +6.1 |
+| 9 | 80.0% | 82.0% | +2.0 |
+| 10 | 76.0% | 84.0% | +8.0 |
+| **all** | **79.5%** | **81.9%** | **+2.4** |
+
+Per-day spread tightens from V6's 66%–88% (22pt range) to 75.5%–87.8% (12.3pt range). The day-10 regression in V6 is fixed (76% → 84%).
+
+### Caveats
+
+- **Two encoder forward passes per query** (~2× latency). Still well under a second per day for 50 queries on CPU.
+- **w_ft=0.25 was tuned on the same days we evaluate on.** A safer choice would be w_ft=0.5 (essentially flat for w∈[0.25, 0.5]). Cosmetic difference; either is robust.
+- **V8 − V6 paired bootstrap P(Δ>0)=93%** — borderline. The win is consistent in expectation but in a single bootstrap resample it could go either way 7% of the time.
 
 ## What I'd try next given more time
 

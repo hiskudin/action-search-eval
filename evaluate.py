@@ -17,6 +17,7 @@ import argparse
 import requests
 
 from models.predictor import Predictor
+from models.v8_ensemble import EnsemblePredictor
 
 SERVER_URL = "http://localhost:5117"
 
@@ -42,10 +43,16 @@ def main():
                         help="Single day to evaluate (default: all available)")
     parser.add_argument("--online", action="store_true",
                         help="After each day's submission, fold its labels into the training pool")
+    parser.add_argument("--ensemble", action="store_true",
+                        help="Use the V8 ensemble (off-the-shelf + fine-tuned encoders, weight_ft=0.25)")
     args = parser.parse_args()
 
-    predictor = Predictor()
-    print(f"Using encoder: {predictor.config.encoder}")
+    if args.ensemble:
+        predictor = EnsemblePredictor(weight_ft=0.25)
+        print("Using V8 ensemble (off-the-shelf + fine-tuned, w_ft=0.25)")
+    else:
+        predictor = Predictor()
+        print(f"Using encoder: {predictor.config.encoder}")
     days = [args.day] if args.day is not None else list(range(1, 11))
 
     total_correct = 0

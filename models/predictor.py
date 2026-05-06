@@ -88,7 +88,8 @@ class Predictor:
             for aid in self.action_ids
         }
 
-    def predict_batch(self, queries: list[str]) -> list[str]:
+    def score_batch(self, queries: list[str]) -> list[dict[str, float]]:
+        """Return the per-action score dict for each query (no argmax)."""
         if not queries:
             return []
         q = self.model.encode(
@@ -104,8 +105,11 @@ class Predictor:
             }
             for i in top_idx:
                 scores[self.train_labels[i]] += float(row[i])
-            out.append(max(scores, key=scores.get))
+            out.append(scores)
         return out
+
+    def predict_batch(self, queries: list[str]) -> list[str]:
+        return [max(s, key=s.get) for s in self.score_batch(queries)]
 
     def predict(self, query: str) -> str:
         return self.predict_batch([query])[0]
