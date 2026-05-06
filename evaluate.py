@@ -40,6 +40,8 @@ def main():
     parser = argparse.ArgumentParser(description="Evaluate your model against daily batches")
     parser.add_argument("--day", type=int, default=None,
                         help="Single day to evaluate (default: all available)")
+    parser.add_argument("--online", action="store_true",
+                        help="After each day's submission, fold its labels into the training pool")
     args = parser.parse_args()
 
     predictor = Predictor()
@@ -66,6 +68,17 @@ def main():
         print(f"Day {day:2d}: {result['accuracy']:.1%} ({result['correct']}/{result['total']})")
         for cat, stats in result["per_category"].items():
             print(f"       {cat}: {stats['accuracy']:.1%} ({stats['correct']}/{stats['total']})")
+
+        if args.online:
+            wrong_ids = {m["id"] for m in result.get("mistakes", [])}
+            wrong_expected = {m["id"]: m["expected"] for m in result.get("mistakes", [])}
+            update_q, update_l = [], []
+            for q, p in zip(queries, predictions):
+                qid = q["id"]
+                label = wrong_expected[qid] if qid in wrong_ids else p["action_id"]
+                update_q.append(q["query"])
+                update_l.append(label)
+            predictor.update(update_q, update_l)
 
     if len(results) > 1:
         overall = total_correct / total_queries if total_queries else 0

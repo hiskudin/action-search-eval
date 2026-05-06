@@ -54,6 +54,28 @@ class Predictor:
         self.train_embs = self.model.encode(
             train_queries, normalize_embeddings=True, show_progress_bar=False
         )
+        self._counts = counts
+
+    def update(self, queries: list[str], labels: list[str]) -> None:
+        """Append (query, label) pairs to the kNN index and refresh the prior.
+
+        Used for online learning: after each day's predictions are graded,
+        fold the day's true labels into the training pool for future days.
+        """
+        if not queries:
+            return
+        new_embs = self.model.encode(
+            queries, normalize_embeddings=True, show_progress_bar=False
+        )
+        self.train_embs = np.vstack([self.train_embs, new_embs])
+        self.train_labels.extend(labels)
+        for label in labels:
+            self._counts[label] += 1
+        total = sum(self._counts.values()) + self.config.smoothing * len(self.action_ids)
+        self.log_prior = {
+            aid: float(np.log((self._counts.get(aid, 0) + self.config.smoothing) / total))
+            for aid in self.action_ids
+        }
 
     def predict_batch(self, queries: list[str]) -> list[str]:
         if not queries:
