@@ -1,19 +1,22 @@
-"""
-Evaluation client. Fetches daily batches from the server and submits predictions.
+"""Evaluation client. Fetches daily batches from the server and submits predictions.
 
-This shows candidates the expected workflow:
+Workflow:
   1. Fetch the day's queries from the server
-  2. Run your model on each query
+  2. Run the model on each query
   3. Submit predictions back to the server
-  4. Get your score
+  4. Get the score
 
 Usage:
     python evaluate.py            # run all available days
     python evaluate.py --day 3    # run a single day
+
+Model lives in `models/predictor.py`. See RESULTS.md for the full iteration log.
 """
 import argparse
-import json
+
 import requests
+
+from models.predictor import Predictor
 
 SERVER_URL = "http://localhost:5117"
 
@@ -35,53 +38,12 @@ def submit_predictions(day: int, predictions: list[dict]) -> dict:
 
 def main():
     parser = argparse.ArgumentParser(description="Evaluate your model against daily batches")
-    parser.add_argument("--day", type=int, default=None, help="Single day to evaluate (default: all available)")
+    parser.add_argument("--day", type=int, default=None,
+                        help="Single day to evaluate (default: all available)")
     args = parser.parse_args()
 
-    # ── Model: kNN over labeled train queries + log-prior from train frequency ──
-    # See RESULTS.md for the full iteration log. The baseline scored 33.3% on
-    # days 1-10; this pipeline scores 66.7% (+33.4pt absolute).
-    import json
-    from collections import Counter
-    from pathlib import Path
-
-    import numpy as np
-    from sentence_transformers import SentenceTransformer
-
-    MODEL_NAME = "sentence-transformers/all-MiniLM-L6-v2"
-    K = 10
-    PRIOR_LAMBDA = 0.1
-    DATA_DIR = Path(__file__).parent / "data"
-
-    with open(DATA_DIR / "actions.json") as f:
-        actions = json.load(f)
-    with open(DATA_DIR / "train.jsonl") as f:
-        train = [json.loads(l) for l in f]
-
-    action_ids = [a["id"] for a in actions]
-    counts = Counter(s["action_id"] for s in train)
-    total = sum(counts.values()) + len(action_ids)
-    log_prior = {aid: np.log((counts.get(aid, 0) + 1) / total) for aid in action_ids}
-
-    model = SentenceTransformer(MODEL_NAME)
-    train_queries = [s["query"] for s in train]
-    train_labels = [s["action_id"] for s in train]
-    train_embs = model.encode(train_queries, normalize_embeddings=True, show_progress_bar=False)
-
-    def predict_query(query: str) -> str:
-        q = model.encode([query], normalize_embeddings=True, show_progress_bar=False)
-        sims = (q @ train_embs.T)[0]
-        top_idx = np.argpartition(-sims, K)[:K]
-        scores = {aid: PRIOR_LAMBDA * log_prior[aid] for aid in action_ids}
-        for i in top_idx:
-            scores[train_labels[i]] += float(sims[i])
-        return max(scores, key=scores.get)
-
-    # Determine which days to run
-    if args.day is not None:
-        days = [args.day]
-    else:
-        days = list(range(1, 11))
+    predictor = Predictor()
+    days = [args.day] if args.day is not None else list(range(1, 11))
 
     total_correct = 0
     total_queries = 0
@@ -93,9 +55,8 @@ def main():
         except requests.HTTPError:
             continue
 
-        predictions = []
-        for q in queries:
-            predictions.append({"id": q["id"], "action_id": predict_query(q["query"])})
+        preds = predictor.predict_batch([q["query"] for q in queries])
+        predictions = [{"id": q["id"], "action_id": p} for q, p in zip(queries, preds)]
 
         result = submit_predictions(day, predictions)
         results[day] = result

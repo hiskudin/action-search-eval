@@ -12,4 +12,3 @@ venv/
 model_cache/
 .DS_Store
 _internal/
-models/

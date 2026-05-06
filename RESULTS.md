@@ -2,6 +2,25 @@
 
 Iterative log of model improvements. Validation split: days 9–10 (held out from tuning). Dev split: days 1–8.
 
+## Summary
+
+| version | approach | dev (1–8) | val (9–10) | all days |
+|---|---|---|---|---|
+| V0 | MiniLM cosine vs action `label + description` | 33.4% | 33.0% | **33.3%** |
+| V1 | kNN k=10 over 193 train queries | 65.3% | 68.0% | 65.9% |
+| **V2 ⭐** | V1 + log-prior (λ=0.1) on train action freq | **66.3%** | **68.0%** | **66.7%** |
+| V3 | V2 + bge-reranker over action text or train pairs | ≤66.3% | ≤69% | flat / negative |
+| V4 | V2 + TF-IDF RRF / encoder swap to bge-small | ≤66.3% | ≤70% | flat / negative |
+
+**Final pipeline = V2.** Lives in `models/predictor.py`, imported by `evaluate.py`. Regression test in `tests/test_predictor.py` pins accuracy ≥60% on days 1–10. Δ vs baseline: **+33.4pt absolute** on all days.
+
+### Caveats up front (see "Methodology limitations" near the bottom)
+
+- Days 9–10 ("val") were peeked at during sweeps — not a true holdout.
+- Per-day variance is 59%–76%; the 30-day grader could land anywhere in that range.
+- V2's +1.0pt over V1 is within bootstrap noise on 398 dev samples.
+- Train accuracy reported below is *not* leave-one-out; the index contains the train queries themselves.
+
 ## V0 — Baseline (MiniLM, action text only)
 
 `baseline.py` as shipped. Embeds `f"{label}: {description}"` for each of 31 actions with `all-MiniLM-L6-v2`, returns argmax cosine over the action index. Encoder normalized.
